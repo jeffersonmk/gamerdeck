@@ -12,6 +12,7 @@ cartridges/main.py
 cartridges/window.py
 cartridges/details_dialog.py
 cartridges/game.py
+cartridges/platforms.py
 cartridges/preferences.py
 
 cartridges/utils/create_dialog.py

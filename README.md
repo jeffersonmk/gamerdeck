@@ -48,6 +48,7 @@ Cartridges is an easy-to-use, elegant game launcher written in Python using GTK4
   - Flatpak
   - Desktop Entries
 - Filtering games by source
+- A badge on each cover with the platform the game came from (Steam, Epic, GOG, Amazon, Lutris, Faugus...); clicking it opens that app (the page of the game on Steam). The game menu has "Open Steam" (or the right app) too
 - Searching and sorting by title, date added and last played
 - Hiding games
 - Automatically downloading cover art from [SteamGridDB](https://www.steamgriddb.com/)
@@ -65,7 +66,7 @@ Xbox and PlayStation controllers (wired or Bluetooth) can navigate the whole app
 | D-pad or left stick | D-pad or left stick | Move the focus (hold to repeat) |
 | A | ✕ | Launch the game, or press the focused button |
 | B | ○ | Close the menu or dialog, leave the search, go back |
-| X | □ | Open the menu of the focused game (Details, Edit, Hide, Remove) |
+| X | □ | Open the menu of the focused game (Details, Edit, Hide, Remove, Open the app it came from) |
 | Y | △ | Search |
 | LB / RB | L1 / R1 | Previous / next source in the sidebar |
 | Menu | Options | Show or hide the sidebar |

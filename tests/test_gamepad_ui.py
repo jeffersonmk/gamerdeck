@@ -1,9 +1,8 @@
-"""Controller navigation on the real window, driven under Broadway.
+"""Controller navigation on the real window, without opening anything on your screen.
 
-Runs tests/gamepad_ui.py in a private Broadway display (see
-tests/run_gamepad_ui.sh). Broadway only lays the grid out on time while a
-browser is connected, so the test is skipped unless GAMEDECK_BROWSER points
-to a Chromium/Chrome binary (it is started headless).
+Runs tests/gamepad_ui.py through tests/run_gamepad_ui.sh: on a virtual KWin
+Wayland session when KWin is installed, else on a Broadway display with a
+headless browser (GAMEDECK_BROWSER, a Chromium/Chrome binary).
 """
 
 # pylint: disable=missing-function-docstring
@@ -28,10 +27,18 @@ def clean_env() -> dict:
     return env
 
 
-@unittest.skipUnless(shutil.which("gtk4-broadwayd"), "gtk4-broadwayd is not installed")
+def has_virtual_wayland() -> bool:
+    return bool(shutil.which("kwin_wayland") and shutil.which("dbus-run-session"))
+
+
+def has_broadway_and_browser() -> bool:
+    browser = os.environ.get("GAMEDECK_BROWSER")
+    return bool(shutil.which("gtk4-broadwayd") and browser and Path(browser).is_file())
+
+
 @unittest.skipUnless(
-    os.environ.get("GAMEDECK_BROWSER") and Path(os.environ["GAMEDECK_BROWSER"]).is_file(),
-    "set GAMEDECK_BROWSER to a Chromium/Chrome binary",
+    has_virtual_wayland() or has_broadway_and_browser(),
+    "needs kwin_wayland, or gtk4-broadwayd and GAMEDECK_BROWSER (a Chromium binary)",
 )
 class GamepadWindowTests(unittest.TestCase):
     def test_controller_navigates_the_window(self):

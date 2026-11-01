@@ -26,6 +26,7 @@ from cartridges import shared
 from cartridges.game import Game
 from cartridges.game_cover import GameCover
 from cartridges.game_widget import GameWidget
+from cartridges.platforms import platform_of
 from cartridges.utils.relative_date import relative_date
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk, Pango
 
@@ -68,6 +69,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
     details_view_added: Gtk.ShortcutLabel = Gtk.Template.Child()
     details_view_last_played: Gtk.Label = Gtk.Template.Child()
     details_view_hide_button: Gtk.Button = Gtk.Template.Child()
+    details_view_platform_button: Gtk.Button = Gtk.Template.Child()
 
     hidden_library_page: Adw.NavigationPage = Gtk.Template.Child()
     hidden_primary_menu_button: Gtk.MenuButton = Gtk.Template.Child()
@@ -686,6 +688,16 @@ class CartridgesWindow(Adw.ApplicationWindow):
 
         self.details_view_hide_button.set_icon_name(icon)
         self.details_view_hide_button.set_tooltip_text(text)
+
+        platform = platform_of(game)
+        client = platform.client if platform else None
+        self.details_view_platform_button.set_visible(client is not None)
+        if platform and client:
+            self.details_view_platform_button.set_icon_name(platform.icon)
+            self.details_view_platform_button.set_tooltip_text(
+                # The variable is the name of the app that installed the game
+                _("Open {}").format(client.name)
+            )
 
         if self.details_view_game_cover:
             self.details_view_game_cover.remove_picture(self.details_view_cover)

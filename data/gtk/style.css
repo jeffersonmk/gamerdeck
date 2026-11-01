@@ -14,6 +14,17 @@ gridview.library > child {
   background: none;
 }
 
+/* The platform (Steam, Epic...) a game came from, on its cover */
+button.platform-badge {
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+}
+
+button.platform-badge image {
+  -gtk-icon-size: 12px;
+}
+
 #details_view {
   background-color: white;
 }

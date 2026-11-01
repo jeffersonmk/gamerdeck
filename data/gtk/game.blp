@@ -51,6 +51,21 @@ template $GameWidget: Box {
         }
       }
 
+      [overlay]
+      Button platform_button {
+        visible: false;
+        halign: start;
+        valign: end;
+        margin-start: 6;
+        margin-bottom: 56;
+
+        styles [
+          "circular",
+          "osd",
+          "platform-badge",
+        ]
+      }
+
       Button cover_button {
         name: "cover_button";
         overflow: hidden;

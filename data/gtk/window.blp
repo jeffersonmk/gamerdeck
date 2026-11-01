@@ -465,6 +465,16 @@ Adw.NavigationPage details_page {
                   ]
                 }
 
+                Button details_view_platform_button {
+                  visible: false;
+                  action-name: "app.open_game_client";
+
+                  styles [
+                    "raised",
+                    "circular",
+                  ]
+                }
+
                 MenuButton {
                   icon-name: "system-search-symbolic";
                   menu-model: search;

@@ -23,6 +23,7 @@ install_data(
     'game_widget.py',
     'game_cover.py',
     'gamepad.py',
+    'platforms.py',
     configure_file(input: 'shared.py.in', output: 'shared.py', configuration: conf),
   ],
   install_dir: moduledir,

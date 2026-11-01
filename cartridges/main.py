@@ -49,6 +49,7 @@ from cartridges.importer.lutris_source import LutrisSource
 from cartridges.importer.retroarch_source import RetroarchSource
 from cartridges.importer.steam_source import SteamSource
 from cartridges.logging.setup import log_system_info, setup_logging
+from cartridges.platforms import client_of, open_client
 from cartridges.preferences import CartridgesPreferences
 from cartridges.store.managers.cover_manager import CoverManager
 from cartridges.store.managers.display_manager import DisplayManager
@@ -149,6 +150,7 @@ class CartridgesApplication(Adw.Application):
                 ("launch_game",),
                 ("hide_game",),
                 ("show_game_details",),
+                ("open_game_client",),
                 ("edit_game",),
                 ("add_game", ("<primary>n",)),
                 ("import", ("<primary>i",)),
@@ -339,6 +341,16 @@ class CartridgesApplication(Adw.Application):
 
     def on_show_game_details_action(self, *_args: Any) -> None:
         shared.win.show_details_page(shared.win.active_game)
+
+    def on_open_game_client_action(self, *_args: Any) -> None:
+        game = shared.win.active_game
+        if (client := client_of(game)) and open_client(game):
+            toast = Adw.Toast.new(
+                # The variable is the name of an app, like Steam
+                _("Opening {}…").format(client.name)
+            )
+            toast.set_timeout(2)
+            shared.win.toast_overlay.add_toast(toast)
 
     def on_edit_game_action(self, *_args: Any) -> None:
         DetailsDialog(shared.win.active_game).present(shared.win)

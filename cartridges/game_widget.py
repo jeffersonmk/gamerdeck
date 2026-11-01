@@ -20,11 +20,12 @@
 from typing import Any, Optional
 from weakref import WeakSet
 
-from gi.repository import Gtk
+from gi.repository import Gio, Gtk
 
 from cartridges import shared
 from cartridges.game import Game
 from cartridges.game_cover import GameCover
+from cartridges.platforms import platform_of
 
 
 @Gtk.Template(resource_path=shared.PREFIX + "/gtk/game.ui")
@@ -43,6 +44,7 @@ class GameWidget(Gtk.Box):
     cover = Gtk.Template.Child()
     spinner = Gtk.Template.Child()
     cover_button = Gtk.Template.Child()
+    platform_button = Gtk.Template.Child()
     menu_button = Gtk.Template.Child()
     play_revealer = Gtk.Template.Child()
     menu_revealer = Gtk.Template.Child()
@@ -58,7 +60,7 @@ class GameWidget(Gtk.Box):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.instances.add(self)
-        self._menu_model = None
+        self._menu_key = None
 
         self.set_play_icon()
 
@@ -68,6 +70,7 @@ class GameWidget(Gtk.Box):
         self.event_contoller_motion.connect("leave", self.toggle_play, None, None)
         self.cover_button.connect("clicked", self.main_button_clicked, False)
         self.play_button.connect("clicked", self.main_button_clicked, True)
+        self.platform_button.connect("clicked", self.platform_clicked)
 
         # The menu is only built when opened: building a popover for every
         # card made scrolling and filtering slow
@@ -76,12 +79,32 @@ class GameWidget(Gtk.Box):
     def create_menu(self, menu_button: Gtk.MenuButton) -> None:
         if not self.game:
             return
-        menu_model = self.hidden_game_options if self.game.hidden else self.game_options
-        if menu_model is self._menu_model:
+        base = self.hidden_game_options if self.game.hidden else self.game_options
+        platform = platform_of(self.game)
+        client = platform.client if platform else None
+
+        key = (base, client)
+        if key == self._menu_key:
             return
         # GTK builds a new popover for every set_menu_model() call
-        self._menu_model = menu_model
-        menu_button.set_menu_model(menu_model)
+        self._menu_key = key
+
+        model = base
+        if client:
+            # The game menu plus "Open Steam" (or the client of the game)
+            model = Gio.Menu()
+            # The items of the game menu, as a section of their own, not as a
+            # menu inside a menu
+            model.append_section(None, base.get_item_link(0, "section"))
+            open_client_section = Gio.Menu()
+            open_client_section.append(
+                # The variable is the name of an app, like Steam
+                _("Open {}").format(client.name),
+                "app.open_game_client",
+            )
+            model.append_section(None, open_client_section)
+
+        menu_button.set_menu_model(model)
         popover = menu_button.get_popover()
         popover.connect("notify::visible", self.toggle_play, None)
         popover.connect("notify::visible", self.on_menu_visible)
@@ -102,6 +125,7 @@ class GameWidget(Gtk.Box):
         self.list_item = None
         if self.menu_button.get_active():
             self.menu_button.popdown()
+        self.platform_button.set_visible(False)
         self.play_revealer.set_reveal_child(False)
         self.menu_revealer.set_reveal_child(False)
 
@@ -124,6 +148,25 @@ class GameWidget(Gtk.Box):
         self.title.set_label(game.name)
         self.update_loading()
         self.set_cover(game.game_cover)
+        self.update_platform()
+
+    def update_platform(self) -> None:
+        """Show where the game came from, if it has an app to open"""
+        platform = platform_of(self.game) if self.game else None
+        client = platform.client if platform else None
+        self.platform_button.set_visible(client is not None)
+        if platform and client:
+            self.platform_button.set_icon_name(platform.icon)
+            self.platform_button.set_tooltip_text(
+                # The variable is the name of an app, like Steam
+                _("Open {}").format(client.name)
+            )
+
+    def platform_clicked(self, _button: Gtk.Button) -> None:
+        if not self.game:
+            return
+        shared.win.active_game = self.game
+        shared.win.get_application().activate_action("open_game_client", None)
 
     def on_menu_visible(self, *_args: Any) -> None:
         if self.game:
