@@ -27,6 +27,7 @@ from cartridges.game import Game
 from cartridges.game_cover import GameCover
 from cartridges.game_widget import GameWidget
 from cartridges.platforms import platform_of
+from cartridges.utils.protondb import open_page, show_rating
 from cartridges.utils.relative_date import relative_date
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk, Pango
 
@@ -70,6 +71,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
     details_view_last_played: Gtk.Label = Gtk.Template.Child()
     details_view_hide_button: Gtk.Button = Gtk.Template.Child()
     details_view_platform_button: Gtk.Button = Gtk.Template.Child()
+    details_view_protondb_button: Gtk.Button = Gtk.Template.Child()
 
     hidden_library_page: Adw.NavigationPage = Gtk.Template.Child()
     hidden_primary_menu_button: Gtk.MenuButton = Gtk.Template.Child()
@@ -230,6 +232,10 @@ class CartridgesWindow(Adw.ApplicationWindow):
         # which kept removed games alive and scaled with the library size
         shared.schema.connect(
             "changed::cover-launches-game", self.on_cover_launches_game_changed
+        )
+        shared.schema.connect("changed::protondb", self.on_protondb_changed)
+        self.details_view_protondb_button.connect(
+            "clicked", self.on_details_protondb_clicked
         )
 
         if platform == "darwin":
@@ -604,6 +610,29 @@ class CartridgesWindow(Adw.ApplicationWindow):
 
         GLib.idle_add(run)
 
+    def on_protondb_changed(self, *_args: Any) -> None:
+        for widget in GameWidget.instances:
+            widget.update_protondb(request=True)
+        self.update_details_protondb(request=True)
+
+    def update_details_protondb(self, game: Optional[Game] = None, request: bool = False) -> None:
+        """Show the ProtonDB rating on the details page (if it is that game's)"""
+        shown = getattr(self, "active_game", None)
+        if shown is None or (game is not None and game is not shown):
+            return
+        enabled = shared.schema.get_boolean("protondb")
+        show_rating(
+            self.details_view_protondb_button,
+            shown.protondb if enabled else None,
+            prefix=_("ProtonDB: "),
+        )
+        if enabled and request:
+            shown.request_protondb()
+
+    def on_details_protondb_clicked(self, *_args: Any) -> None:
+        if (game := getattr(self, "active_game", None)) and game.protondb:
+            open_page(game.protondb)
+
     def on_cover_launches_game_changed(self, *_args: Any) -> None:
         for widget in GameWidget.instances:
             widget.set_play_icon()
@@ -729,6 +758,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
             self.navigation_view.push(self.details_page)
             self.set_focus(self.details_view_play_button)
 
+        self.update_details_protondb(request=True)
         self.set_details_view_opacity()
 
     def set_details_view_opacity(self, *_args: Any) -> None:

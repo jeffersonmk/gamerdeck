@@ -61,6 +61,10 @@ class Game(GObject.Object):
 
     widget: Optional["GameWidget"] = None
 
+    # ProtonDB rating (a utils.protondb.Rating) and whether it was looked up
+    protondb: Optional[Any] = None
+    protondb_checked: bool = False
+
     def __init__(self, data: dict[str, Any], **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
@@ -102,6 +106,21 @@ class Game(GObject.Object):
             shared.win.toasts[(self, action)] = toast
 
         shared.win.toast_overlay.add_toast(toast)
+
+    def request_protondb(self) -> None:
+        """Look up the ProtonDB rating once; the card and the page update when it arrives"""
+        if self.protondb_checked:
+            return
+        from cartridges.utils.protondb import ratings  # pylint: disable=import-outside-toplevel
+
+        ratings.request(self, self.protondb_ready)
+
+    def protondb_ready(self, _game: "Game", rating: Optional[Any], ok: bool) -> None:
+        self.protondb = rating
+        self.protondb_checked = ok  # After a network failure the next bind asks again
+        if self.widget is not None:
+            self.widget.update_protondb()
+        shared.win.update_details_protondb(self)
 
     def launch(self) -> None:
         self.last_played = int(time())

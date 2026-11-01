@@ -63,6 +63,7 @@ template $CartridgesWindow: Adw.ApplicationWindow {
       details_view_title.halign: center;
       details_view_developer.halign: center;
       details_view_date_box.halign: center;
+      details_view_protondb_button.halign: center;
       details_view_toolbar.halign: center;
       details_view_toolbar.orientation: vertical;
       details_view_play_button.halign: center;
@@ -408,6 +409,16 @@ Adw.NavigationPage details_page {
                 natural-wrap-mode: word;
                 justify: center;
               }
+            }
+
+            Button details_view_protondb_button {
+              visible: false;
+              margin-top: 12;
+              halign: start;
+
+              styles [
+                "protondb-badge",
+              ]
             }
 
             Box details_view_toolbar {

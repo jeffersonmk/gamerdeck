@@ -26,6 +26,7 @@ from cartridges import shared
 from cartridges.game import Game
 from cartridges.game_cover import GameCover
 from cartridges.platforms import platform_of
+from cartridges.utils.protondb import open_page, show_rating
 
 
 @Gtk.Template(resource_path=shared.PREFIX + "/gtk/game.ui")
@@ -45,6 +46,7 @@ class GameWidget(Gtk.Box):
     spinner = Gtk.Template.Child()
     cover_button = Gtk.Template.Child()
     platform_button = Gtk.Template.Child()
+    protondb_button = Gtk.Template.Child()
     menu_button = Gtk.Template.Child()
     play_revealer = Gtk.Template.Child()
     menu_revealer = Gtk.Template.Child()
@@ -71,6 +73,7 @@ class GameWidget(Gtk.Box):
         self.cover_button.connect("clicked", self.main_button_clicked, False)
         self.play_button.connect("clicked", self.main_button_clicked, True)
         self.platform_button.connect("clicked", self.platform_clicked)
+        self.protondb_button.connect("clicked", self.protondb_clicked)
 
         # The menu is only built when opened: building a popover for every
         # card made scrolling and filtering slow
@@ -126,6 +129,7 @@ class GameWidget(Gtk.Box):
         if self.menu_button.get_active():
             self.menu_button.popdown()
         self.platform_button.set_visible(False)
+        self.protondb_button.set_visible(False)
         self.play_revealer.set_reveal_child(False)
         self.menu_revealer.set_reveal_child(False)
 
@@ -149,6 +153,18 @@ class GameWidget(Gtk.Box):
         self.update_loading()
         self.set_cover(game.game_cover)
         self.update_platform()
+        self.update_protondb(request=True)
+
+    def update_protondb(self, request: bool = False) -> None:
+        """Show the ProtonDB rating of the game, asking for it if needed"""
+        enabled = self.game is not None and shared.schema.get_boolean("protondb")
+        show_rating(self.protondb_button, self.game.protondb if enabled else None)
+        if enabled and request:
+            self.game.request_protondb()
+
+    def protondb_clicked(self, _button: Gtk.Button) -> None:
+        if self.game and self.game.protondb:
+            open_page(self.game.protondb)
 
     def update_platform(self) -> None:
         """Show where the game came from, if it has an app to open"""

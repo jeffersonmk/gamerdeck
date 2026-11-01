@@ -11,6 +11,9 @@
     <key name="cover-launches-game" type="b">
       <default>false</default>
     </key>
+    <key name="protondb" type="b">
+      <default>true</default>
+    </key>
     <key name="high-quality-images" type="b">
       <default>false</default>
     </key>

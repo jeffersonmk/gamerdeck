@@ -16,6 +16,7 @@ cartridges/platforms.py
 cartridges/preferences.py
 
 cartridges/utils/create_dialog.py
+cartridges/utils/protondb.py
 cartridges/utils/relative_date.py
 
 cartridges/importer/importer.py

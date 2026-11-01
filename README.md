@@ -52,6 +52,7 @@ Cartridges is an easy-to-use, elegant game launcher written in Python using GTK4
 - Searching and sorting by title, date added and last played
 - Hiding games
 - Automatically downloading cover art from [SteamGridDB](https://www.steamgriddb.com/)
+- ProtonDB ratings (Platinum, Gold, Silver, Bronze, Borked) on each cover and on the details page, for Steam games and for games of the other platforms whose title matches a Steam game exactly. Ratings are cached for a week and can be turned off in the preferences (the Steam ID or the title of each game is sent to Steam and ProtonDB)
 - Searching for games on various databases
 - Animated covers
 - A search provider for GNOME

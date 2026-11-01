@@ -59,6 +59,7 @@ class CartridgesPreferences(Adw.PreferencesDialog):
 
     exit_after_launch_switch: Adw.SwitchRow = Gtk.Template.Child()
     cover_launches_game_switch: Adw.SwitchRow = Gtk.Template.Child()
+    protondb_switch: Adw.SwitchRow = Gtk.Template.Child()
     high_quality_images_switch: Adw.SwitchRow = Gtk.Template.Child()
 
     auto_import_switch: Adw.SwitchRow = Gtk.Template.Child()
@@ -244,6 +245,7 @@ class CartridgesPreferences(Adw.PreferencesDialog):
                 "exit-after-launch",
                 "cover-launches-game",
                 "high-quality-images",
+                "protondb",
                 "auto-import",
                 "remove-missing",
                 "lutris-import-steam",

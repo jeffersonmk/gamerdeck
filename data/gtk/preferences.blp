@@ -22,6 +22,15 @@ template $CartridgesPreferences: Adw.PreferencesDialog {
       }
     }
 
+    Adw.PreferencesGroup online_group {
+      title: _("Online");
+
+      Adw.SwitchRow protondb_switch {
+        title: _("ProtonDB Ratings");
+        subtitle: _("Show how well games run on Linux. The Steam ID or title of each game is sent to Steam and ProtonDB");
+      }
+    }
+
     Adw.PreferencesGroup images_group {
       title: _("Images");
 

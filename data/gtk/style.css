@@ -25,6 +25,31 @@ button.platform-badge image {
   -gtk-icon-size: 12px;
 }
 
+/* ProtonDB rating: the tier colors are the ones ProtonDB uses */
+button.protondb-badge {
+  min-height: 18px;
+  padding: 0 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #1b1b1f;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+#details_view button.protondb-badge {
+  min-height: 24px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+button.protondb-platinum { background: #b4c7dc; }
+button.protondb-gold { background: #cfb53b; }
+button.protondb-silver { background: #a6a6a6; }
+button.protondb-bronze { background: #cd7f32; }
+button.protondb-borked { background: #e5484d; color: white; }
+button.protondb-pending { background: #8c8c91; color: white; }
+
 #details_view {
   background-color: white;
 }
