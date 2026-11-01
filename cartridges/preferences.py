@@ -33,6 +33,7 @@ from cartridges.errors.friendly_error import FriendlyError
 from cartridges.game import Game
 from cartridges.importer.bottles_source import BottlesSource
 from cartridges.importer.desktop_source import DesktopSource
+from cartridges.importer.faugus_source import FaugusSource
 from cartridges.importer.flatpak_source import FlatpakSource
 from cartridges.importer.heroic_source import HeroicSource
 from cartridges.importer.itch_source import ItchSource
@@ -72,6 +73,10 @@ class CartridgesPreferences(Adw.PreferencesDialog):
     lutris_data_file_chooser_button: Gtk.Button = Gtk.Template.Child()
     lutris_import_steam_switch: Adw.SwitchRow = Gtk.Template.Child()
     lutris_import_flatpak_switch: Adw.SwitchRow = Gtk.Template.Child()
+
+    faugus_expander_row: Adw.ExpanderRow = Gtk.Template.Child()
+    faugus_data_action_row: Adw.ActionRow = Gtk.Template.Child()
+    faugus_data_file_chooser_button: Gtk.Button = Gtk.Template.Child()
 
     heroic_expander_row: Adw.ExpanderRow = Gtk.Template.Child()
     heroic_config_action_row: Adw.ActionRow = Gtk.Template.Child()
@@ -157,6 +162,7 @@ class CartridgesPreferences(Adw.PreferencesDialog):
         # Sources settings
         for source_class in (
             BottlesSource,
+            FaugusSource,
             FlatpakSource,
             HeroicSource,
             ItchSource,

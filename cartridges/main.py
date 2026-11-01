@@ -39,6 +39,7 @@ from cartridges.game import Game
 from cartridges.gamepad import GamepadController
 from cartridges.importer.bottles_source import BottlesSource
 from cartridges.importer.desktop_source import DesktopSource
+from cartridges.importer.faugus_source import FaugusSource
 from cartridges.importer.flatpak_source import FlatpakSource
 from cartridges.importer.heroic_source import HeroicSource
 from cartridges.importer.importer import Importer  # yo dawg
@@ -353,6 +354,9 @@ class CartridgesApplication(Adw.Application):
 
         if shared.schema.get_boolean("lutris"):
             shared.importer.add_source(LutrisSource())
+
+        if shared.schema.get_boolean("faugus"):
+            shared.importer.add_source(FaugusSource())
 
         if shared.schema.get_boolean("steam"):
             shared.importer.add_source(SteamSource())

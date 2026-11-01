@@ -13,6 +13,7 @@
   </gresource>
   <gresource prefix="@PREFIX@/icons/scalable/categories/">
   <file alias="bottles-source-symbolic.svg">icons/sources/bottles-source-symbolic.svg</file>
+  <file alias="faugus-source-symbolic.svg">icons/sources/faugus-source-symbolic.svg</file>
   <file alias="flatpak-source-symbolic.svg">icons/sources/flatpak-source-symbolic.svg</file>
   <file alias="heroic-source-symbolic.svg">icons/sources/heroic-source-symbolic.svg</file>
   <file alias="itch-source-symbolic.svg">icons/sources/itch-source-symbolic.svg</file>

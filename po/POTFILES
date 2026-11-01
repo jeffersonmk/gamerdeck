@@ -23,6 +23,7 @@ cartridges/importer/location.py
 cartridges/importer/location.py
 cartridges/importer/bottles_source.py
 cartridges/importer/desktop_source.py
+cartridges/importer/faugus_source.py
 cartridges/importer/flatpak_source.py
 cartridges/importer/heroic_source.py
 cartridges/importer/itch_source.py

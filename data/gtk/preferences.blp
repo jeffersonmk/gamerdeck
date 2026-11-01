@@ -137,6 +137,33 @@ template $CartridgesPreferences: Adw.PreferencesDialog {
         }
       }
 
+      Adw.ExpanderRow faugus_expander_row {
+        title: _("Faugus");
+        show-enable-switch: true;
+
+        [prefix]
+        Image {
+          icon-name: "faugus-source-symbolic";
+        }
+
+        Adw.ActionRow faugus_data_action_row {
+          title: _("Install Location");
+
+          Button faugus_data_file_chooser_button {
+            icon-name: "folder-symbolic";
+            valign: center;
+
+            styles [
+              "flat"
+            ]
+          }
+
+          styles [
+            "property"
+          ]
+        }
+      }
+
       Adw.ExpanderRow heroic_expander_row {
         title: _("Heroic");
         show-enable-switch: true;

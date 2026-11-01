@@ -8,5 +8,5 @@ Terminal=false
 Type=Application
 Categories=GNOME;GTK;Game;PackageManager;
 # Translators: Leave "cartridges" untranslated here.
-Keywords=gaming;games;play;cartridges;launch;launcher;steam;lutris;heroic;epic;bottles;itch;legendary;retroarch;
+Keywords=gaming;games;play;cartridges;launch;launcher;steam;lutris;faugus;heroic;epic;bottles;itch;legendary;retroarch;
 StartupNotify=true

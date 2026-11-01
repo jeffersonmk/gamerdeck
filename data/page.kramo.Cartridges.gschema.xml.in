@@ -68,6 +68,12 @@
     <key name="itch-location" type="s">
       <default>"~/.var/app/io.itch.itch/config/itch/"</default>
     </key>
+    <key name="faugus" type="b">
+      <default>true</default>
+    </key>
+    <key name="faugus-location" type="s">
+      <default>"~/.local/share/faugus-launcher/"</default>
+    </key>
     <key name="legendary" type="b">
       <default>true</default>
     </key>

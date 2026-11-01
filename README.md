@@ -39,6 +39,7 @@ Cartridges is an easy-to-use, elegant game launcher written in Python using GTK4
 - Importing games from various sources (only games: launchers like Steam or Heroic, tools like Proton, Goverlay or ProtonUp-Qt, and emulators are skipped):
   - Steam
   - Lutris
+  - Faugus Launcher
   - Heroic
   - Bottles
   - itch

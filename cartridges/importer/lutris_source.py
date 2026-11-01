@@ -41,12 +41,12 @@ class LutrisSourceIterable(SourceIterable):
                 games.name,
                 games.slug,
                 games.runner,
-                categories.name = ".hidden" as hidden
+                COALESCE(MAX(categories.name = ".hidden"), 0) AS hidden
             FROM
                 games
             LEFT JOIN
                 games_categories ON games_categories.game_id = games.id
-            FULL JOIN
+            LEFT JOIN
                 categories ON games_categories.category_id = categories.id
             WHERE
                 games.name IS NOT NULL
@@ -55,6 +55,8 @@ class LutrisSourceIterable(SourceIterable):
                 AND games.installed
                 AND (games.runner IS NOT "steam" OR :import_steam)
                 AND (games.runner IS NOT "flatpak" OR :import_flatpak)
+            GROUP BY
+                games.id
             ;
         """
 
@@ -74,7 +76,7 @@ class LutrisSourceIterable(SourceIterable):
             # Create game
             values = {
                 "added": shared.import_time,
-                "hidden": row[4],
+                "hidden": bool(row[4]),
                 "name": row[1],
                 "source": f"{self.source.source_id}_{row[3]}",
                 "game_id": self.source.game_id_format.format(

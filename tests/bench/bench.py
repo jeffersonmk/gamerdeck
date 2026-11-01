@@ -134,7 +134,7 @@ def child(args: argparse.Namespace) -> None:
     }
 
     for key in ("lutris", "heroic", "bottles", "flatpak", "desktop", "itch",
-                "legendary", "retroarch", "sgdb"):
+                "legendary", "retroarch", "faugus", "sgdb"):
         shared.schema.set_boolean(key, False)
     shared.schema.set_boolean("steam", True)
     shared.schema.set_boolean("remove-missing", False)
