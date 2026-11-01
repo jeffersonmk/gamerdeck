@@ -27,6 +27,7 @@ from gi.repository import GLib, Gtk
 
 from cartridges import shared
 from cartridges.game import Game
+from cartridges.importer.not_games import is_not_a_game_desktop_entry
 from cartridges.importer.source import Source, SourceIterable
 
 
@@ -84,9 +85,8 @@ class DesktopSourceIterable(SourceIterable):
                 try:
                     keyfile.load_from_file(str(entry), 0)
 
-                    if "Game" not in keyfile.get_string_list(
-                        "Desktop Entry", "Categories"
-                    ):
+                    categories = keyfile.get_string_list("Desktop Entry", "Categories")
+                    if "Game" not in categories:
                         continue
 
                     name = keyfile.get_string("Desktop Entry", "Name")
@@ -103,6 +103,10 @@ class DesktopSourceIterable(SourceIterable):
 
                 except GLib.Error:
                     pass
+
+                # Skip launchers, tools and emulators (not games)
+                if is_not_a_game_desktop_entry(entry.stem, name, executable, categories):
+                    continue
 
                 # Skip Steam games
                 if "steam://rungameid/" in executable:

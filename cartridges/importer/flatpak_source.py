@@ -26,6 +26,7 @@ from gi.repository import GLib, Gtk
 from cartridges import shared
 from cartridges.game import Game
 from cartridges.importer.location import Location, LocationSubPath
+from cartridges.importer.not_games import is_not_a_game_desktop_entry
 from cartridges.importer.source import ExecutableFormatSource, SourceIterable
 
 
@@ -45,6 +46,7 @@ class FlatpakSourceIterable(SourceIterable):
         if not (system_data or user_data):
             return
 
+        import_launchers = shared.schema.get_boolean("flatpak-import-launchers")
         blacklist = (
             {
                 "hu.kramo.Cartridges",
@@ -52,7 +54,7 @@ class FlatpakSourceIterable(SourceIterable):
                 "page.kramo.Cartridges",
                 "page.kramo.Cartridges.Devel",
             }
-            if shared.schema.get_boolean("flatpak-import-launchers")
+            if import_launchers
             else {
                 "hu.kramo.Cartridges",
                 "hu.kramo.Cartridges.Devel",
@@ -85,7 +87,8 @@ class FlatpakSourceIterable(SourceIterable):
             try:
                 keyfile.load_from_file(str(entry), 0)
 
-                if "Game" not in keyfile.get_string_list("Desktop Entry", "Categories"):
+                categories = keyfile.get_string_list("Desktop Entry", "Categories")
+                if "Game" not in categories:
                     continue
 
                 if (
@@ -96,6 +99,12 @@ class FlatpakSourceIterable(SourceIterable):
                 name = keyfile.get_string("Desktop Entry", "Name")
 
             except GLib.Error:
+                continue
+
+            # Launchers, tools and emulators, unless the user asked for them
+            if not import_launchers and is_not_a_game_desktop_entry(
+                flatpak_id, name, f"flatpak run {flatpak_id}", categories
+            ):
                 continue
 
             values = {

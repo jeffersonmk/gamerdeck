@@ -29,6 +29,7 @@ from cartridges.errors.error_producer import ErrorProducer
 from cartridges.errors.friendly_error import FriendlyError
 from cartridges.game import Game
 from cartridges.importer.location import UnresolvableLocationError
+from cartridges.importer.not_games import is_not_a_game_name
 from cartridges.importer.source import Source
 from cartridges.store.managers.async_manager import AsyncManager
 from cartridges.store.pipeline import Pipeline
@@ -165,6 +166,7 @@ class Importer(ErrorProducer):
     def finish_import(self) -> None:
         """Callback called when importing has finished"""
         logging.info("Import done")
+        self.remove_not_games()
         self.remove_games()
         self.imported_game_ids = shared.store.new_game_ids
         shared.store.new_game_ids = set()
@@ -180,6 +182,34 @@ class Importer(ErrorProducer):
         shared.win.get_application().lookup_action("preferences").set_enabled(True)
         shared.win.get_application().state = shared.AppState.DEFAULT
         shared.win.create_source_rows()
+
+    @staticmethod
+    def is_not_a_game(game: Game) -> bool:
+        """Whether a game found by a source is a launcher, a tool or a runtime"""
+        if game.source == "imported":  # Added by hand
+            return False
+        if game.base_source == "flatpak" and shared.schema.get_boolean(
+            "flatpak-import-launchers"
+        ):
+            return False
+        return is_not_a_game_name(game.name)
+
+    def remove_not_games(self) -> None:
+        """Remove what earlier imports took for games (Proton, launchers...)
+
+        Unlike missing games this ignores the "remove missing" setting: these
+        are not games and the undo button of the summary brings them back.
+        """
+        for game in shared.store:
+            if game.removed or not self.is_not_a_game(game):
+                continue
+
+            logging.info("Removing %s (%s): not a game", game.name, game.game_id)
+
+            game.removed = True
+            game.save()
+            game.update()
+            self.removed_game_ids.add(game.game_id)
 
     def remove_games(self) -> None:
         """Set removed to True for missing games"""
@@ -256,6 +286,11 @@ class Importer(ErrorProducer):
                     source.source_id,
                     type(iteration_result),
                 )
+                continue
+
+            # Launchers, tools and Steam runtimes are not games
+            if self.is_not_a_game(game):
+                logging.info("Skipped %s (%s): not a game", game.name, game.game_id)
                 continue
 
             # Register game
