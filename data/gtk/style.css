@@ -74,3 +74,139 @@ button.protondb-pending { background: #8c8c91; color: white; }
     background-color: white;
   }
 }
+
+/* ---- Vitrine: banner, row of recent games and button legend ---- */
+
+.hero {
+  background: alpha(@accent_bg_color, 0.12);
+  border-bottom: 1px solid alpha(currentColor, 0.1);
+}
+
+.hero-background {
+  opacity: 0.55;
+}
+
+/* A veil that melts the banner into the window and tints it with the
+   accent color of the system, in light and dark mode */
+.hero-scrim {
+  background-image: linear-gradient(
+    to right,
+    alpha(@window_bg_color, 0.92) 0%,
+    alpha(mix(@window_bg_color, @accent_bg_color, 0.2), 0.55) 55%,
+    alpha(@accent_bg_color, 0.2) 100%
+  );
+}
+
+.hero-cover {
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.hero-subtitle {
+  opacity: 0.75;
+}
+
+.hero-pill {
+  min-height: 24px;
+  padding: 0 12px;
+  background: alpha(currentColor, 0.1);
+}
+
+.hero-play {
+  padding-left: 28px;
+  padding-right: 28px;
+}
+
+.rail-item {
+  padding: 4px;
+  border-radius: 12px;
+  background: none;
+  box-shadow: none;
+}
+
+.rail-item:hover {
+  background: alpha(currentColor, 0.08);
+}
+
+.rail-item:focus-visible {
+  outline: 2px solid @accent_color;
+  outline-offset: -2px;
+}
+
+.rail-cover {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.hint-bar {
+  padding: 8px 18px;
+  border-top: 1px solid alpha(currentColor, 0.1);
+  background: alpha(@headerbar_bg_color, 0.9);
+}
+
+.hint-label {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* A controller button: round for the face buttons, a pill for bumpers and menu */
+.pad-glyph {
+  font-weight: 800;
+  font-size: 11px;
+  color: white;
+  /* min sizes do not include the padding below: 20 + 2 = 22 */
+  min-width: 20px;
+  min-height: 22px;
+  border-radius: 99px;
+  background: #5b5b60;
+}
+
+.pad-glyph.pad-pill {
+  padding: 0 8px;
+  border-radius: 8px;
+  background: alpha(currentColor, 0.22);
+  color: @window_fg_color;
+  font-size: 10px;
+}
+
+/* Xbox: the colors of the letters */
+.pad-xbox.pad-a { background: #43a047; }
+.pad-xbox.pad-b { background: #e53935; }
+.pad-xbox.pad-x { background: #1e88e5; }
+.pad-xbox.pad-y { background: #f9a825; color: #1b1b1f; }
+
+/* PlayStation: dark buttons with the colors of the symbols */
+.pad-playstation.pad-a { background: #2b2b33; color: #6ea4ff; }
+.pad-playstation.pad-b { background: #2b2b33; color: #ff6b6b; }
+.pad-playstation.pad-x { background: #2b2b33; color: #f48fd0; }
+.pad-playstation.pad-y { background: #2b2b33; color: #4fd6a0; }
+
+.rail { background: none; }
+.hint-item { margin: 0 9px; }
+.pad-playstation.pad-a, .pad-playstation.pad-b, .pad-playstation.pad-x, .pad-playstation.pad-y {
+  background: #3d3d48;
+}
+
+/* Alignment of the symbols. The font puts letters about 1px left of the
+   center and the text of the pills 1px high; the padding moves them back (it
+   was measured on the rendered window; tests/gamepad_ui.py checks that every
+   symbol is within 1px of the center of its button). */
+.pad-glyph { padding: 0 0 0 2px; }
+.pad-glyph.pad-pill { min-width: 16px; min-height: 20px; padding: 2px 7px 0 9px; }
+
+.pad-glyph.pad-text { padding: 2px 8px 0 8px; }
+
+/* The PlayStation symbols come from different fonts and have different sizes:
+   they are scaled to look alike */
+.pad-playstation.pad-a { font-size: 16px; min-width: 22px; min-height: 20px; padding: 2px 0 0 0; }
+.pad-playstation.pad-b { font-size: 16px; }
+.pad-playstation.pad-x { font-size: 12px; min-width: 21px; min-height: 21px; padding: 1px 0 0 1px; }
+.pad-playstation.pad-y { font-size: 10px; min-width: 21px; min-height: 21px; padding: 1px 0 0 1px; }
+
+/* The square and the triangle are drawn (hints.py), the button is the circle */
+.pad-glyph.pad-shape { padding: 0; min-width: 22px; min-height: 22px; }
+
+.hint-bar.compact { padding: 6px 6px; }
+.hint-bar.compact .hint-item { margin: 0 3px; }
+.hint-bar.compact .hint-label { font-size: 11px; }

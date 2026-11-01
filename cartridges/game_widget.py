@@ -70,6 +70,11 @@ class GameWidget(Gtk.Box):
         self.add_controller(self.event_contoller_motion)
         self.event_contoller_motion.connect("enter", self.toggle_play, False)
         self.event_contoller_motion.connect("leave", self.toggle_play, None, None)
+        self.event_contoller_motion.connect("enter", self.show_in_banner)
+
+        focus = Gtk.EventControllerFocus()
+        focus.connect("enter", self.show_in_banner)
+        self.add_controller(focus)
         self.cover_button.connect("clicked", self.main_button_clicked, False)
         self.play_button.connect("clicked", self.main_button_clicked, True)
         self.platform_button.connect("clicked", self.platform_clicked)
@@ -78,6 +83,11 @@ class GameWidget(Gtk.Box):
         # The menu is only built when opened: building a popover for every
         # card made scrolling and filtering slow
         self.menu_button.set_create_popup_func(self.create_menu)
+
+    def show_in_banner(self, *_args: Any) -> None:
+        """The banner on top of the library shows the game in focus or under the pointer"""
+        if self.game and shared.win is not None:
+            shared.win.set_hero_game(self.game)
 
     def create_menu(self, menu_button: Gtk.MenuButton) -> None:
         if not self.game:

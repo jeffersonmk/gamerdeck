@@ -2,7 +2,7 @@
 
 Runs tests/gamepad_ui.py through tests/run_gamepad_ui.sh: on a virtual KWin
 Wayland session when KWin is installed, else on a Broadway display with a
-headless browser (GAMEDECK_BROWSER, a Chromium/Chrome binary).
+headless browser (GAMERDECK_BROWSER, a Chromium/Chrome binary).
 """
 
 # pylint: disable=missing-function-docstring
@@ -20,7 +20,7 @@ REPO = Path(__file__).resolve().parent.parent
 def clean_env() -> dict:
     """tests.support points HOME/XDG_* at a sandbox in this process: the
     browser should not inherit that"""
-    keep = ("XDG_RUNTIME_DIR", "GAMEDECK_BROWSER", "GAMEDECK_PREFIX", "GAMEPAD_UI_DISPLAY")
+    keep = ("XDG_RUNTIME_DIR", "GAMERDECK_BROWSER", "GAMERDECK_PREFIX", "GAMEPAD_UI_DISPLAY")
     env = {key: os.environ[key] for key in keep if key in os.environ}
     env["PATH"] = "/usr/local/bin:/usr/bin:/bin"
     env["HOME"] = pwd.getpwuid(os.getuid()).pw_dir
@@ -32,13 +32,13 @@ def has_virtual_wayland() -> bool:
 
 
 def has_broadway_and_browser() -> bool:
-    browser = os.environ.get("GAMEDECK_BROWSER")
+    browser = os.environ.get("GAMERDECK_BROWSER")
     return bool(shutil.which("gtk4-broadwayd") and browser and Path(browser).is_file())
 
 
 @unittest.skipUnless(
     has_virtual_wayland() or has_broadway_and_browser(),
-    "needs kwin_wayland, or gtk4-broadwayd and GAMEDECK_BROWSER (a Chromium binary)",
+    "needs kwin_wayland, or gtk4-broadwayd and GAMERDECK_BROWSER (a Chromium binary)",
 )
 class GamepadWindowTests(unittest.TestCase):
     def test_controller_navigates_the_window(self):

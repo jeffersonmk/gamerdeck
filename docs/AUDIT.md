@@ -1,4 +1,4 @@
-# GameDeck — Audit, technology evaluation and refactoring plan
+# Gamerdeck — Audit, technology evaluation and refactoring plan
 
 > Audited base: `main` at `d56323e` (identical to `kra-mo/cartridges` `main`:
 > 0 commits ahead, 0 behind). Date: 2026-10-13.

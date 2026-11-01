@@ -15,7 +15,7 @@
 <div align="center">
   <img src="data/icons/hicolor/scalable/apps/page.kramo.Cartridges.svg" width="128" height="128">
 
-  # Cartridges
+  # Gamerdeck
 
   A GTK4 + Libadwaita game launcher
 
@@ -31,7 +31,7 @@
 
 # The Project
 
-Cartridges is an easy-to-use, elegant game launcher written in Python using GTK4 and Libadwaita.
+Gamerdeck is an easy-to-use, elegant game launcher written in Python using GTK4 and Libadwaita. It is a fork of [Cartridges](https://apps.gnome.org/Cartridges/) by kramo, made to run well with big libraries and with a controller.
 
 ## Features
 
@@ -72,6 +72,12 @@ Xbox and PlayStation controllers (wired or Bluetooth) can navigate the whole app
 | LB / RB | L1 / R1 | Previous / next source in the sidebar |
 | Menu | Options | Show or hide the sidebar |
 
+### Banner and button legend
+
+The top of the library shows a banner with the game that has the focus (or the pointer): its cover, developer, last played date, the platform it came from (click to open the app), its ProtonDB rating, and **Play** and **Details** buttons. Below it, **Continue Playing** lists the games played last. The banner follows the system accent color, in light and dark mode, and gives way to the search results while you search. Windows shorter than 860 px hide the recent games row, and narrow ones (below 565 px) use a compact banner.
+
+At the bottom of the window, a legend shows what each controller button does right now (library, sidebar, card menu, dialog, search, details page), drawn with the symbols of the controller you are using: A B X Y for Xbox, ✕ ○ □ △ for PlayStation. In the preferences, **Controller** lets you show it only when a controller is connected (the default), always, or never, and choose the Xbox or PlayStation symbols instead of following the controller in use.
+
 The controller only works while the app window has the focus, so it never reacts while you are playing. If libmanette is not installed, the app works as before. The Flatpak needs `--device=input` to see controllers.
 
 To try it without a controller, `tests/gamepad_uinput.py` creates virtual Xbox and DualSense controllers (see the file for how to run it).
@@ -109,7 +115,7 @@ Install the latest release with the command: `winget install cartridges`.
 1. Download the latest release from [GitHub Releases](https://github.com/kra-mo/cartridges/releases).
 2. Move the app into your Applications folder.
 
-Note: macOS might tell you that the application could not be checked for malicious software or something similar. In this case, open System Settings > Privacy & Security, scroll down, find the warning about Cartridges and click "Open Anyway". More information can be found [here](https://support.apple.com/en-us/102445).
+Note: macOS might tell you that the application could not be checked for malicious software or something similar. In this case, open System Settings > Privacy & Security, scroll down, find the warning about Gamerdeck and click "Open Anyway". More information can be found [here](https://support.apple.com/en-us/102445).
 
 ## Building manually
 

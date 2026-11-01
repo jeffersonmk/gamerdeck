@@ -1,0 +1,131 @@
+using Gtk 4.0;
+
+template $LibraryHero: Box {
+  orientation: vertical;
+
+  styles [
+    "hero",
+  ]
+
+  Overlay {
+    overflow: hidden;
+
+    // This box gives the banner its height
+    Box hero_size {
+      height-request: 190;
+    }
+
+    // The blurred cover of the game, under a scrim in the theme's accent color
+    [overlay]
+    Picture background {
+      content-fit: cover;
+      can-shrink: true;
+
+      styles [
+        "hero-background",
+      ]
+    }
+
+    [overlay]
+    Box {
+      can-target: false;
+
+      styles [
+        "hero-scrim",
+      ]
+    }
+
+    [overlay]
+    Box content {
+      spacing: 20;
+      margin-top: 18;
+      margin-bottom: 18;
+      margin-start: 20;
+      margin-end: 20;
+
+      Picture cover {
+        width-request: 100;
+        height-request: 150;
+        valign: center;
+        halign: start;
+
+        styles [
+          "card",
+          "hero-cover",
+        ]
+      }
+
+      Box info {
+        orientation: vertical;
+        valign: center;
+        hexpand: true;
+        spacing: 4;
+
+        Label title {
+          halign: start;
+          ellipsize: end;
+          max-width-chars: 40;
+
+          styles [
+            "title-1",
+          ]
+        }
+
+        Label subtitle {
+          halign: start;
+          ellipsize: end;
+
+          styles [
+            "hero-subtitle",
+          ]
+        }
+
+        Box pills {
+          spacing: 8;
+          margin-top: 8;
+
+          Button platform_button {
+            visible: false;
+
+            styles [
+              "pill",
+              "hero-pill",
+            ]
+          }
+
+          Button protondb_button {
+            visible: false;
+            valign: center;
+
+            styles [
+              "protondb-badge",
+            ]
+          }
+        }
+      }
+
+      Box actions {
+        valign: center;
+        spacing: 8;
+
+        Button play_button {
+          label: _("Play");
+
+          styles [
+            "suggested-action",
+            "pill",
+            "hero-play",
+          ]
+        }
+
+        Button details_button {
+          label: _("Details");
+
+          styles [
+            "pill",
+          ]
+        }
+      }
+    }
+  }
+}

@@ -5,10 +5,10 @@
          xmlns:gnome="http://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name>Cartridges</name>
+  <name>Gamerdeck</name>
   <shortdesc xml:lang="en">Launch all your games</shortdesc>
   <description xml:lang="en">
-Cartridges is a simple game launcher for all of your games. It has support for importing games from Steam, Lutris, Heroic and more with no login necessary. You can sort and hide games or download cover art from SteamGridDB.
+Gamerdeck is a simple game launcher for all of your games. It has support for importing games from Steam, Lutris, Heroic and more with no login necessary. You can sort and hide games or download cover art from SteamGridDB.
   </description>
 
   <homepage rdf:resource="https://git.kramo.page/cartridges" />

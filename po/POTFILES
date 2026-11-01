@@ -4,6 +4,7 @@ data/page.kramo.Cartridges.metainfo.xml.in
 
 data/gtk/details-dialog.blp
 data/gtk/game.blp
+data/gtk/hero.blp
 data/gtk/preferences.blp
 data/gtk/shortcuts-dialog.blp
 data/gtk/window.blp
@@ -12,6 +13,8 @@ cartridges/main.py
 cartridges/window.py
 cartridges/details_dialog.py
 cartridges/game.py
+cartridges/hints.py
+cartridges/hero.py
 cartridges/platforms.py
 cartridges/preferences.py
 

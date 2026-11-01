@@ -27,7 +27,7 @@ The following attributes are saved:
 
 The date at which the game was added.
 
-Cartridges will set the value for itself. Don't touch it.
+Gamerdeck will set the value for itself. Don't touch it.
 
 Stored as a Unix time stamp.
 
@@ -65,9 +65,9 @@ Stored as a boolean.
 
 ### last_played
 
-The date at which the game was last launched from Cartridges.
+The date at which the game was last launched from Gamerdeck.
 
-Cartridges will set the value for itself. Don't touch it.
+Gamerdeck will set the value for itself. Don't touch it.
 
 Stored as a Unix time stamp. 0 if the game hasn't been played yet.
 
@@ -91,7 +91,7 @@ Stored as a string.
 
 Whether or not a game has been removed.
 
-Cartridges will set the value for itself. Don't touch it.
+Gamerdeck will set the value for itself. Don't touch it.
 
 Stored as a boolean.
 
@@ -111,6 +111,6 @@ Stored as a boolean.
 
 The version number of the [game_id].json specification.
 
-Cartridges will set the value for itself. Don't touch it.
+Gamerdeck will set the value for itself. Don't touch it.
 
 Stored as a number.

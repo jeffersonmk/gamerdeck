@@ -3,6 +3,7 @@ blueprints = custom_target(
   input: files(
     'gtk/details-dialog.blp',
     'gtk/game.blp',
+    'gtk/hero.blp',
     'gtk/preferences.blp',
     'gtk/shortcuts-dialog.blp',
     'gtk/window.blp',

@@ -1,4 +1,4 @@
-# GameDeck benchmark
+# Gamerdeck benchmark
 
 `bench.py` measures an **installed** build (via `meson install`) against a
 synthetic library in an isolated environment: fake HOME/XDG/TMPDIR, in-memory

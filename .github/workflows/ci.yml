@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Windows Installer
-          path: _build/build-aux/windows/Output/Cartridges Windows.exe
+          path: _build/build-aux/windows/Output/Gamerdeck Windows.exe
 
   macos:
     name: macOS
@@ -90,10 +90,10 @@ jobs:
       - name: Zip
         run: |
           cd build-aux/macos/dist
-          zip -yr Cartridges\ macOS.zip Cartridges.app
+          zip -yr Gamerdeck\ macOS.zip Gamerdeck.app
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          path: build-aux/macos/dist/Cartridges macOS.zip
+          path: build-aux/macos/dist/Gamerdeck macOS.zip
           name: macOS Application

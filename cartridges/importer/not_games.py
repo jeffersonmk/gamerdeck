@@ -1,6 +1,6 @@
 # not_games.py
 #
-# Copyright 2026 GameDeck contributors
+# Copyright 2026 Gamerdeck contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ NOT_GAME_NAMES = frozenset(
         "minigalaxy",
         "gamehub",
         "cartridges",
-        "gamedeck",
+        "gamerdeck",
         "prism launcher",
         "minecraft launcher",
         "playnite",
@@ -126,7 +126,7 @@ NOT_GAME_PATTERNS = tuple(
         r"^Wallpaper Engine$",
         r"^Source SDK Base 20\d\d\b.*$",
         r"^.+ Dedicated Server$",
-        r"^(GameDeck|Cartridges)\b.*$",  # this app, including its test build
+        r"^(Gamerdeck|Cartridges)\b.*$",  # this app, including its test build
     )
 )
 
@@ -146,7 +146,7 @@ NOT_GAME_DESKTOP_IDS = frozenset(
         "itch",
         "page.kramo.cartridges",
         "hu.kramo.cartridges",
-        "io.github.jeffersonmk.gamedeck",
+        "io.github.jeffersonmk.gamerdeck",
         "io.github.sharkwouter.minigalaxy",
         "com.github.tkashkin.gamehub",
         "org.prismlauncher.prismlauncher",
@@ -183,7 +183,7 @@ NOT_GAME_COMMANDS = frozenset(
         "pcsx2",
         "pcsx2-qt",
         "cartridges",
-        "gamedeck",
+        "gamerdeck",
     }
 )
 

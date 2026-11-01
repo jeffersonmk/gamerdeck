@@ -27,7 +27,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="Cartridges",
+    name="Gamerdeck",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -46,11 +46,11 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="Cartridges",
+    name="Gamerdeck",
 )
 app = BUNDLE(
     coll,
-    name="Cartridges.app",
+    name="Gamerdeck.app",
     icon="./icon.icns",
     bundle_identifier="page.kramo.Cartridges",
     info_plist={

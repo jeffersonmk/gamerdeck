@@ -1,6 +1,6 @@
 # gamepad.py
 #
-# Copyright 2026 GameDeck contributors
+# Copyright 2026 Gamerdeck contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -219,6 +219,7 @@ class GamepadController:
         self.input = GamepadInput(self.dispatch)
         self.monitor = None
         self.devices: set = set()
+        self.last_device: Any = None  # The one used last: its symbols are shown
 
     def start(self) -> bool:
         if Manette is None:
@@ -236,10 +237,29 @@ class GamepadController:
             self._device_connected(self.monitor, device)
         return True
 
+    @property
+    def family(self) -> str:
+        """"xbox" or "playstation": the layout of the controller in use"""
+        from cartridges import hints  # pylint: disable=import-outside-toplevel
+
+        device = self.last_device if self.last_device in self.devices else None
+        if device is None and self.devices:
+            device = sorted(self.devices, key=lambda d: d.get_name() or "")[0]
+        if device is None:
+            return hints.XBOX
+        return hints.controller_family(device.get_name() or "", device.get_guid() or "")
+
+    def _hints_changed(self) -> None:
+        win = getattr(self.app, "get_active_window", lambda: None)()
+        if win is not None and hasattr(win, "update_hints"):
+            win.update_hints()
+
     def _device_connected(self, _monitor: Any, device: Any) -> None:
         if device in self.devices:
             return
         self.devices.add(device)
+        self.last_device = device
+        self._hints_changed()
         logging.info("Gamepad connected: %s", device.get_name())
         device.connect("button-press-event", self._on_button, True)
         device.connect("button-release-event", self._on_button, False)
@@ -248,12 +268,18 @@ class GamepadController:
 
     def _device_disconnected(self, _monitor: Any, device: Any) -> None:
         self.devices.discard(device)
+        if self.last_device is device:
+            self.last_device = None
         self.input.release_all()
+        self._hints_changed()
         logging.info("Gamepad disconnected: %s", device.get_name())
 
-    def _on_button(self, _device: Any, event: Any, pressed: bool) -> None:
+    def _on_button(self, device: Any, event: Any, pressed: bool) -> None:
         found, code = event.get_button()
         if found:
+            if device is not self.last_device:
+                self.last_device = device
+                self._hints_changed()
             self.input.button(code, pressed)
 
     def _on_hat(self, _device: Any, event: Any) -> None:

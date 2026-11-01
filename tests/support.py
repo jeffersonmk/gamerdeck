@@ -1,7 +1,7 @@
-"""Shared setup for GameDeck tests.
+"""Shared setup for Gamerdeck tests.
 
 The app modules need a meson-installed build (compiled resources, configured
-shared.py, GSettings schema). Point GAMEDECK_PREFIX at it (default: _install
+shared.py, GSettings schema). Point GAMERDECK_PREFIX at it (default: _install
 in the repo root, created with `meson setup _build --prefix=$PWD/_install &&
 meson install -C _build`).
 
@@ -16,16 +16,16 @@ import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-PREFIX = Path(os.environ.get("GAMEDECK_PREFIX", REPO / "_install")).resolve()
+PREFIX = Path(os.environ.get("GAMERDECK_PREFIX", REPO / "_install")).resolve()
 
 if not (PREFIX / "share" / "cartridges" / "cartridges.gresource").is_file():
     raise SystemExit(
         f"No installed build found in {PREFIX}. Run:\n"
         "  meson setup _build --prefix=$PWD/_install && meson install -C _build\n"
-        "or set GAMEDECK_PREFIX."
+        "or set GAMERDECK_PREFIX."
     )
 
-SANDBOX = Path(tempfile.mkdtemp(prefix="gamedeck-tests-"))
+SANDBOX = Path(tempfile.mkdtemp(prefix="gamerdeck-tests-"))
 for var, sub in (
     ("HOME", "home"),
     ("XDG_DATA_HOME", "data"),

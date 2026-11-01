@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproducible, headless performance benchmark for GameDeck (Cartridges).
+"""Reproducible, headless performance benchmark for Gamerdeck (Cartridges).
 
 Runs an installed build (``meson install`` into a prefix) against a synthetic,
 isolated library: fake HOME/XDG dirs, in-memory GSettings and the GTK Broadway
@@ -507,7 +507,7 @@ if __name__ == "__main__":
     p.add_argument("--import-games", type=int, default=200)
     p.add_argument("--runs", type=int, default=3)
     p.add_argument("--workdir", default=os.path.join(
-        os.environ.get("TMPDIR", "/tmp"), "gamedeck-bench"))
+        os.environ.get("TMPDIR", "/tmp"), "gamerdeck-bench"))
     p.add_argument("--out")
     p.add_argument("--child", action="store_true")
     p.add_argument("--scroll", action="store_true",

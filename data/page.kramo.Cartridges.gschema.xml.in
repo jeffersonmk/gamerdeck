@@ -11,6 +11,12 @@
     <key name="cover-launches-game" type="b">
       <default>false</default>
     </key>
+    <key name="hints-mode" type="s">
+      <default>"auto"</default>
+    </key>
+    <key name="hints-style" type="s">
+      <default>"auto"</default>
+    </key>
     <key name="protondb" type="b">
       <default>true</default>
     </key>

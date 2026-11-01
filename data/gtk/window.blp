@@ -44,14 +44,26 @@ Adw.StatusPage hidden_notice_empty {
 }
 
 template $CartridgesWindow: Adw.ApplicationWindow {
-  title: _("Cartridges");
+  title: _("Gamerdeck");
   width-request: 360;
   height-request: 100;
+
+  Adw.Breakpoint {
+    // Short windows keep the grid, not the row of recent games
+    condition ("max-height: 860px")
+
+    setters {
+      rail_box.visible: false;
+    }
+  }
 
   Adw.Breakpoint {
     condition ("max-width: 564px")
 
     setters {
+      hero.compact: true;
+      hint_bar.compact: true;
+      rail_box.visible: false;
       overlay_split_view.collapsed: true;
       details_view_box.orientation: vertical;
       details_view_box.margin-top: 12;
@@ -71,7 +83,12 @@ template $CartridgesWindow: Adw.ApplicationWindow {
     }
   }
 
-  Adw.ToastOverlay toast_overlay {
+  Box {
+    orientation: vertical;
+
+    Adw.ToastOverlay toast_overlay {
+    vexpand: true;
+
     Adw.NavigationView navigation_view {
       Adw.NavigationPage library_page {
         title: _("All Games");
@@ -81,7 +98,7 @@ template $CartridgesWindow: Adw.ApplicationWindow {
 
           [sidebar]
           Adw.NavigationPage sidebar_navigation_page {
-            title: _("Cartridges");
+            title: _("Gamerdeck");
 
             Adw.ToolbarView {
               [top]
@@ -234,23 +251,89 @@ template $CartridgesWindow: Adw.ApplicationWindow {
               }
             }
 
-            Overlay library_overlay {
-              ScrolledWindow scrolledwindow {
-                hscrollbar-policy: never;
+            Box library_content {
+              orientation: vertical;
 
-                GridView library {
-                  max-columns: 10;
-                  single-click-activate: false;
+              // The game in focus and the games played last, above the grid
+              Revealer library_header_revealer {
+                transition-type: slide_down;
+                reveal-child: false;
 
-                  styles [
-                    "library",
-                  ]
+                Box library_header {
+                  orientation: vertical;
+
+                  $LibraryHero hero {}
+
+                  Box rail_box {
+                    orientation: vertical;
+
+                    Revealer rail_revealer {
+                      transition-type: slide_down;
+
+                      Box {
+                        orientation: vertical;
+
+                        Label {
+                          label: _("Continue Playing");
+                          halign: start;
+                          margin-start: 21;
+                          margin-top: 12;
+                          margin-bottom: 4;
+
+                          styles [
+                            "heading",
+                          ]
+                        }
+
+                        $LibraryRail rail {
+                          margin-start: 15;
+                          margin-end: 15;
+                        }
+                      }
+                    }
+                  }
+
+                  Label library_section_label {
+                    halign: start;
+                    margin-start: 21;
+                    margin-top: 12;
+
+                    styles [
+                      "heading",
+                    ]
+                  }
+                }
+              }
+
+              Overlay library_overlay {
+                vexpand: true;
+
+                ScrolledWindow scrolledwindow {
+                  hscrollbar-policy: never;
+
+                  GridView library {
+                    max-columns: 10;
+                    single-click-activate: false;
+
+                    styles [
+                      "library",
+                    ]
+                  }
                 }
               }
             }
           }
         }
       }
+    }
+    }
+
+    // What the controller buttons do right now
+    Revealer hint_revealer {
+      transition-type: slide_up;
+      reveal-child: false;
+
+      $HintBar hint_bar {}
     }
   }
 }
@@ -559,7 +642,7 @@ menu primary_menu {
   section {
     item (_("Preferences"), "app.preferences")
     item (_("Keyboard Shortcuts"), "app.shortcuts")
-    item (_("About Cartridges"), "app.about")
+    item (_("About Gamerdeck"), "app.about")
   }
 }
 

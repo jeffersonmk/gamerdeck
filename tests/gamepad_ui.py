@@ -94,6 +94,55 @@ def render(widget: Gtk.Widget, path: Path) -> bool:
     return False
 
 
+def glyph_offsets(win, path: Path) -> list:
+    """(symbol, width, height, x offset, y offset) of every symbol of the legend
+
+    The offset is the distance, in pixels, between the center of the ink and the
+    center of its button, measured on the rendered window.
+    """
+    from PIL import Image  # system python only: skipped by the caller if missing
+
+    if not render(win, path):
+        return []
+    image = Image.open(path).convert("RGB")
+    found, item = [], win.hint_bar.get_first_child()
+    while item:
+        child = item.get_first_child()
+        while child:
+            if child.has_css_class("pad-glyph"):
+                _ok, bounds = child.compute_bounds(win)
+                box = (round(bounds.get_x()), round(bounds.get_y()),
+                       round(bounds.get_x() + bounds.get_width()),
+                       round(bounds.get_y() + bounds.get_height()))
+                region = image.crop(box)
+                pixels = region.load()
+                width, height = region.size
+                colors: dict = {}
+                for y in range(height):
+                    for x in range(width):
+                        colors[pixels[x, y]] = colors.get(pixels[x, y], 0) + 1
+                background = max(colors, key=colors.get)
+                ink = [
+                    (x, y)
+                    for y in range(height)
+                    for x in range(width)
+                    if min(x, width - 1 - x) > 2 and min(y, height - 1 - y) > 2  # rounded corners
+                    and sum(abs(a - b) for a, b in zip(pixels[x, y], background)) > 90
+                ]
+                if ink:
+                    xs, ys = [p[0] for p in ink], [p[1] for p in ink]
+                    found.append((
+                        child.get_label(), width, height,
+                        (min(xs) + max(xs) + 1) / 2 - width / 2,
+                        (min(ys) + max(ys) + 1) / 2 - height / 2,
+                    ))
+                else:
+                    found.append((child.get_label(), width, height, 99.0, 99.0))
+            child = child.get_next_sibling()
+        item = item.get_next_sibling()
+    return found
+
+
 def steps(app):
     win = shared.win
     ctl = app.gamepad
@@ -176,6 +225,58 @@ def steps(app):
     check("sidebar is shown", win.overlay_split_view.get_show_sidebar())
     shot("1-start")
 
+    # The banner, the row of recent games and the legend
+    def legend() -> list:
+        return [h.label for h in win.hint_bar.hints]
+
+    def glyphs() -> list:
+        out, item = [], win.hint_bar.get_first_child()
+        while item:
+            out.append(item.get_first_child().get_label())
+            item = item.get_next_sibling()
+        return out
+
+    yield 300
+    check("banner is shown on top of the library", win.library_header_revealer.get_reveal_child())
+    newest = f"Game {N_GAMES - 1:02d}"
+    check("banner starts with the game played last", win.hero.game and win.hero.game.name == newest)
+    check("the row lists the latest games, newest first",
+          [win.rail.store.get_item(i).name for i in range(3)]
+          == [f"Game {N_GAMES - 1 - i:02d}" for i in range(3)])
+    check("the legend is hidden when there is no controller", not win.hint_revealer.get_reveal_child())
+    shared.schema.set_string("hints-mode", "always")
+    shared.schema.set_string("hints-style", "xbox")
+    yield 300
+    check("the legend shows with 'always'", win.hint_revealer.get_reveal_child())
+    check("the library legend", legend() == ["Play", "Menu", "Search", "Sources", "Sidebar"])
+    check("Xbox symbols", glyphs()[:3] == ["A", "X", "Y"])
+    shared.schema.set_string("hints-style", "playstation")
+    yield 300
+    check("PlayStation symbols", glyphs()[:3] == ["✕", "□", "△"])
+
+    # Every symbol sits in the middle of its button, and the buttons are round
+    try:
+        import PIL  # noqa: F401
+    except ImportError:
+        PIL = None
+    if PIL:
+        for style in ("xbox", "playstation"):
+            shared.schema.set_string("hints-style", style)
+            yield 300
+            offsets = glyph_offsets(win, Path(SANDBOX) / f"glyphs-{style}.png")
+            check(f"{style}: the symbols were measured", len(offsets) == 6)
+            for symbol, width, height, dx, dy in offsets:
+                check(f"{style}: {symbol} is centered (off {dx:+.1f}, {dy:+.1f})",
+                      abs(dx) <= 1 and abs(dy) <= 1)
+                check(f"{style}: {symbol} has the height of the legend", height == 22)
+                if symbol in "ABXY✕○□△":
+                    check(f"{style}: {symbol} is round", width == height)
+        shared.schema.set_string("hints-style", "playstation")
+        yield 300
+    shot("1b-playstation-legend")
+    shared.schema.set_string("hints-style", "xbox")
+    yield 200
+
     # Nothing is focused yet: the first direction press focuses the first game
     press(BTN_DPAD_DOWN)
     yield 400
@@ -197,6 +298,9 @@ def steps(app):
     yield 400
     check("up and left come back",
           win.get_focused_card().list_item.get_position() == position)
+    yield 400
+    check("the banner follows the focused game",
+          win.hero.game is win.get_focused_card().game)
     shot("2-card-focused")
 
     # A d-pad reported as a hat and the left stick do the same
@@ -264,6 +368,7 @@ def steps(app):
     check("X opens the card menu", card.menu_button.get_active())
     shot_menu(card)
     check("the first menu item has the focus", in_popover())
+    check("the legend describes the menu", legend() == ["Select", "Close"])
     press(BTN_DPAD_DOWN)
     yield 300
     press(BTN_DPAD_UP)
@@ -309,9 +414,16 @@ def steps(app):
     press(BTN_NORTH)
     yield 300
     check("Y opens the search", win.search_bar.get_search_mode())
+    yield 400
+    check("the legend describes the search", legend() == ["Close Search"])
+    check("the banner makes room for the search results",
+          not win.library_header_revealer.get_reveal_child())
     press(BTN_EAST)
     yield 300
     check("B closes the search", not win.search_bar.get_search_mode())
+    yield 500
+    check("the banner is back after the search", win.library_header_revealer.get_reveal_child())
+    check("the legend is back to the library", legend()[0] == "Play")
 
     # Menu / Options toggles the sidebar and focuses the selected row
     press(BTN_START)
@@ -327,6 +439,7 @@ def steps(app):
     yield from settle(lambda: win.get_visible_dialog() is not None)
     yield 400
     check("preferences dialog is open", win.get_visible_dialog() is not None)
+    check("the legend describes the dialog", legend() == ["Select", "Close"])
     before = win.get_focus()
     press(BTN_DPAD_DOWN)
     yield from settle(lambda: win.get_focus() is not before)
@@ -347,6 +460,18 @@ def steps(app):
     press(BTN_EAST)
     yield 500
     check("B leaves the hidden page", win.navigation_view.get_visible_page() == win.library_page)
+
+    # The Play button of the banner launches the game it shows
+    launched.clear()
+    win.hero.play_button.emit("clicked")
+    yield 300
+    check("the banner's Play launches its game", launched == [win.hero.game.name])
+    win.hero.details_button.emit("clicked")
+    yield 600
+    check("the banner's Details opens the details page",
+          win.navigation_view.get_visible_page() == win.details_page)
+    press(BTN_EAST)
+    yield 500
 
     print("RESULT " + json.dumps(results), flush=True)
     app.quit()

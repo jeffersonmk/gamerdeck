@@ -6,7 +6,7 @@
 # --virtual): the same GTK backend and renderer as on a real desktop, no
 # window on your screen and no input grabs. Otherwise it falls back to GTK's
 # Broadway backend, which only lays out on time while a browser is connected
-# (set GAMEDECK_BROWSER to a Chromium/Chrome binary, it runs headless) and
+# (set GAMERDECK_BROWSER to a Chromium/Chrome binary, it runs headless) and
 # crashes on some icons: use it only when KWin is not available.
 cd "$(dirname "$0")/.." || exit 1
 [ -n "$1" ] && export GAMEPAD_UI_SHOTS="$1"
@@ -39,9 +39,9 @@ gtk4-broadwayd ":$N" >/dev/null 2>&1 &
 BROADWAY=$!
 sleep 1
 BROWSER_PID=
-if [ -n "$GAMEDECK_BROWSER" ]; then
+if [ -n "$GAMERDECK_BROWSER" ]; then
     PROFILE=$(mktemp -d)
-    "$GAMEDECK_BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
+    "$GAMERDECK_BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage \
         --window-size=1600,1000 --user-data-dir="$PROFILE" \
         "http://127.0.0.1:$((8080 + N))/" >/dev/null 2>&1 &
     BROWSER_PID=$!

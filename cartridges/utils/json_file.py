@@ -1,6 +1,6 @@
 # json_file.py
 #
-# Copyright 2026 GameDeck contributors
+# Copyright 2026 Gamerdeck contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ def is_game_file(path: Path) -> bool:
 
 
 # Keys a game file must have, with their accepted types. Files written by any
-# Cartridges version contain them; anything else is corrupt or foreign data
+# Gamerdeck version contain them; anything else is corrupt or foreign data
 # that would otherwise crash Game() and abort loading the whole library.
 REQUIRED_GAME_KEYS: dict[str, tuple[type, ...]] = {
     "game_id": (str,),

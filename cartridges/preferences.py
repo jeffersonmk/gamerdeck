@@ -60,6 +60,8 @@ class CartridgesPreferences(Adw.PreferencesDialog):
     exit_after_launch_switch: Adw.SwitchRow = Gtk.Template.Child()
     cover_launches_game_switch: Adw.SwitchRow = Gtk.Template.Child()
     protondb_switch: Adw.SwitchRow = Gtk.Template.Child()
+    hints_mode_row: Adw.ComboRow = Gtk.Template.Child()
+    hints_style_row: Adw.ComboRow = Gtk.Template.Child()
     high_quality_images_switch: Adw.SwitchRow = Gtk.Template.Child()
 
     auto_import_switch: Adw.SwitchRow = Gtk.Template.Child()
@@ -262,6 +264,12 @@ class CartridgesPreferences(Adw.PreferencesDialog):
             }
         )
 
+        # Controller hints: the position in the list is the value in the settings
+        self.bind_combo_row(self.hints_mode_row, "hints-mode", ("auto", "always", "never"))
+        self.bind_combo_row(
+            self.hints_style_row, "hints-style", ("auto", "xbox", "playstation")
+        )
+
         def set_sgdb_sensitive(widget: Adw.EntryRow) -> None:
             if not widget.get_text():
                 shared.schema.set_boolean("sgdb", False)
@@ -276,6 +284,20 @@ class CartridgesPreferences(Adw.PreferencesDialog):
 
     def get_switch(self, setting: str) -> Any:
         return getattr(self, f'{setting.replace("-", "_")}_switch')
+
+    @staticmethod
+    def bind_combo_row(row: Adw.ComboRow, key: str, values: tuple[str, ...]) -> None:
+        """Keep a combo row and a string setting in sync"""
+        try:
+            row.set_selected(values.index(shared.schema.get_string(key)))
+        except ValueError:
+            row.set_selected(0)
+
+        def selected_changed(*_args: Any) -> None:
+            if 0 <= (index := row.get_selected()) < len(values):
+                shared.schema.set_string(key, values[index])
+
+        row.connect("notify::selected", selected_changed)
 
     def bind_switches(self, settings: set[str]) -> None:
         for setting in settings:

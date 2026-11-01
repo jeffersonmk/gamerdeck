@@ -6,10 +6,10 @@
   </replaces>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <name>Cartridges</name>
+  <name>Gamerdeck</name>
   <summary>Launch all your games</summary>
   <description>
-    <p>Cartridges is a simple game launcher for all of your games. It has support for importing games from Steam, Lutris, Heroic and more with no login necessary. You can sort and hide games or download cover art from SteamGridDB.</p>
+    <p>Gamerdeck is a simple game launcher for all of your games. It has support for importing games from Steam, Lutris, Heroic and more with no login necessary. You can sort and hide games or download cover art from SteamGridDB.</p>
   </description>
   <url type="homepage">https://apps.gnome.org/Cartridges/</url>
   <url type="bugtracker">https://git.kramo.page/cartridges/issues</url>
@@ -37,7 +37,7 @@
   <screenshots>
     <screenshot type="default">
       <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/1.png</image>
-      <caption>Cartridges</caption>
+      <caption>Gamerdeck</caption>
     </screenshot>
     <screenshot>
       <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/2.png</image>

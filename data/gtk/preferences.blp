@@ -22,6 +22,34 @@ template $CartridgesPreferences: Adw.PreferencesDialog {
       }
     }
 
+    Adw.PreferencesGroup controller_group {
+      title: _("Controller");
+
+      Adw.ComboRow hints_mode_row {
+        title: _("Button Hints");
+        subtitle: _("Show what each controller button does at the bottom of the window");
+        model: StringList {
+          strings [
+            _("When a Controller Is Connected"),
+            _("Always"),
+            _("Never"),
+          ]
+        };
+      }
+
+      Adw.ComboRow hints_style_row {
+        title: _("Button Style");
+        subtitle: _("The symbols of the hints");
+        model: StringList {
+          strings [
+            _("Same as the Controller in Use"),
+            _("Xbox"),
+            _("PlayStation"),
+          ]
+        };
+      }
+    }
+
     Adw.PreferencesGroup online_group {
       title: _("Online");
 

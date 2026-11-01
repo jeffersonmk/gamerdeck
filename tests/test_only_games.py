@@ -56,7 +56,7 @@ class NameTests(unittest.TestCase):
             "Parsec",
             "PCSX2",
             "RetroArch",
-            "GameDeck (TESTE)",
+            "Gamerdeck (TESTE)",
             "Cartridges",
         ):
             self.assertTrue(not_games.is_not_a_game_name(name), name)

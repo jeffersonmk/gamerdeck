@@ -1,6 +1,6 @@
 # platforms.py
 #
-# Copyright 2026 GameDeck contributors
+# Copyright 2026 Gamerdeck contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

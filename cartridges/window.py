@@ -26,6 +26,10 @@ from cartridges import shared
 from cartridges.game import Game
 from cartridges.game_cover import GameCover
 from cartridges.game_widget import GameWidget
+from cartridges.hero import LibraryHero  # noqa: F401  (registers the template)
+from cartridges import hints
+from cartridges.hints import HintBar  # noqa: F401  (registers the widget)
+from cartridges.rail import LibraryRail, recent_games  # noqa: F401
 from cartridges.platforms import platform_of
 from cartridges.utils.protondb import open_page, show_rating
 from cartridges.utils.relative_date import relative_date
@@ -71,6 +75,14 @@ class CartridgesWindow(Adw.ApplicationWindow):
     details_view_last_played: Gtk.Label = Gtk.Template.Child()
     details_view_hide_button: Gtk.Button = Gtk.Template.Child()
     details_view_platform_button: Gtk.Button = Gtk.Template.Child()
+    hero: LibraryHero = Gtk.Template.Child()
+    rail: LibraryRail = Gtk.Template.Child()
+    rail_box: Gtk.Box = Gtk.Template.Child()
+    rail_revealer: Gtk.Revealer = Gtk.Template.Child()
+    library_header_revealer: Gtk.Revealer = Gtk.Template.Child()
+    library_section_label: Gtk.Label = Gtk.Template.Child()
+    hint_revealer: Gtk.Revealer = Gtk.Template.Child()
+    hint_bar: HintBar = Gtk.Template.Child()
     details_view_protondb_button: Gtk.Button = Gtk.Template.Child()
 
     hidden_library_page: Adw.NavigationPage = Gtk.Template.Child()
@@ -218,6 +230,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
         self.library_filter.changed(Gtk.FilterChange.DIFFERENT)
         self.scroll_to_top(self.library)
         self.set_library_child()
+        self.queue_library_header()
 
         if self.overlay_split_view.get_collapsed():
             self.overlay_split_view.set_show_sidebar(False)
@@ -234,6 +247,8 @@ class CartridgesWindow(Adw.ApplicationWindow):
             "changed::cover-launches-game", self.on_cover_launches_game_changed
         )
         shared.schema.connect("changed::protondb", self.on_protondb_changed)
+        shared.schema.connect("changed::hints-mode", self.update_hints)
+        shared.schema.connect("changed::hints-style", self.update_hints)
         self.details_view_protondb_button.connect(
             "clicked", self.on_details_protondb_clicked
         )
@@ -280,6 +295,16 @@ class CartridgesWindow(Adw.ApplicationWindow):
             view.add_controller(keys)
 
         self.set_library_child()
+
+        # The banner and the "continue playing" row above the grid
+        self._hero_target: Optional[Game] = None
+        self._hero_timeout = 0
+        self._header_timeout = 0
+        self.connect("notify::focus-widget", self.update_hints)
+        self.navigation_view.connect("notify::visible-page", self.on_page_changed)
+        for search_bar in (self.search_bar, self.hidden_search_bar):
+            search_bar.connect("notify::search-mode-enabled", self.on_page_changed)
+        self.update_hints()
 
         self.notice_empty.set_icon_name(shared.APP_ID + "-symbolic")
 
@@ -522,6 +547,109 @@ class CartridgesWindow(Adw.ApplicationWindow):
         self.sidebar.select_row(rows[target])
         return True
 
+    # The banner and the row of recent games
+
+    def on_page_changed(self, *_args: Any) -> None:
+        self.queue_library_header()
+        self.update_hints()
+
+    def queue_library_header(self) -> None:
+        """Refresh the banner soon, once for any number of changes (imports
+        change the library hundreds of times)"""
+        if self._header_timeout:
+            return
+
+        def run() -> bool:
+            self._header_timeout = 0
+            self.refresh_library_header()
+            return False
+
+        self._header_timeout = GLib.timeout_add(150, run)
+
+    def refresh_library_header(self) -> None:
+        games = list(self.library_model)
+        searching = self.search_bar.get_search_mode()
+        show = bool(games) and not searching
+        self.library_header_revealer.set_reveal_child(show)
+        if not show:
+            return
+
+        recent = recent_games(games)
+        self.rail.set_games(recent)
+        self.rail_revealer.set_reveal_child(bool(recent))
+        self.library_section_label.set_label(self.library_page.get_title())
+
+        target = self._hero_target
+        if target is None or target not in games:
+            target = recent[0] if recent else games[0]
+            self._hero_target = target
+        self.hero.set_game(target)
+
+    def set_hero_game(self, game: Optional[Game]) -> None:
+        """Show a game on the banner (the one with the focus or the pointer)"""
+        if game is None or game is self._hero_target:
+            return
+        self._hero_target = game
+        if self._hero_timeout:
+            return
+
+        def run() -> bool:
+            self._hero_timeout = 0
+            if (
+                self._hero_target in self.library_model
+                and self.library_header_revealer.get_reveal_child()
+            ):
+                self.hero.set_game(self._hero_target)
+            return False
+
+        # Moving fast must not decode a cover for every card it passes
+        self._hero_timeout = GLib.timeout_add(120, run)
+
+    # The controller button legend
+
+    def hint_context(self) -> str:
+        """What the legend should describe: the menu, dialog or page in use"""
+        focus = self.get_focus()
+        if focus is not None and focus.get_ancestor(Gtk.Popover) is not None:
+            return hints.MENU
+        button = focus.get_ancestor(Gtk.MenuButton) if focus is not None else None
+        if button is not None and button.get_active():
+            return hints.MENU
+        if self.get_visible_dialog() is not None:
+            return hints.DIALOG
+
+        page = self.navigation_view.get_visible_page()
+        if page == self.details_page:
+            return hints.DETAILS
+        search_bar = (
+            self.hidden_search_bar if page == self.hidden_library_page else self.search_bar
+        )
+        if search_bar.get_search_mode():
+            return hints.SEARCH
+        if page == self.hidden_library_page:
+            return hints.HIDDEN
+        if self.is_in_sidebar():
+            return hints.SIDEBAR
+        return hints.LIBRARY
+
+    def hint_style(self) -> str:
+        style = shared.schema.get_string("hints-style")
+        if style in (hints.XBOX, hints.PLAYSTATION):
+            return style
+        gamepad = self.get_application().gamepad if self.get_application() else None
+        return gamepad.family if gamepad else hints.XBOX
+
+    def update_hints(self, *_args: Any) -> None:
+        """Show, hide and describe the controller button legend"""
+        mode = shared.schema.get_string("hints-mode")
+        app = self.get_application()
+        gamepad = getattr(app, "gamepad", None)
+        connected = bool(gamepad and gamepad.devices)
+        visible = mode == "always" or (mode != "never" and connected)
+        self.hint_revealer.set_reveal_child(visible)
+        if visible:
+            self.hint_bar.set_hints(hints.hints_for(self.hint_context()), self.hint_style())
+
     def queue_game_update(self, game: Game) -> None:
         """Add, refresh or remove a game in the library views (batched)"""
         self._pending_games[game] = None
@@ -561,6 +689,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
             self.games_model.splice(self.games_model.get_n_items(), 0, new)
 
         self.set_library_child()
+        self.queue_library_header()
         return False
 
     def search_changed(self, _widget: Any, hidden: bool) -> None:
@@ -570,6 +699,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
         )
         self.scroll_to_top(self.hidden_library if hidden else self.library)
         self.set_library_child()
+        self.queue_library_header()
 
     def scroll_to_top(self, *views: Gtk.GridView) -> None:
         """Show the first games after the list changed
@@ -613,10 +743,13 @@ class CartridgesWindow(Adw.ApplicationWindow):
     def on_protondb_changed(self, *_args: Any) -> None:
         for widget in GameWidget.instances:
             widget.update_protondb(request=True)
+        self.hero.sync()
         self.update_details_protondb(request=True)
 
     def update_details_protondb(self, game: Optional[Game] = None, request: bool = False) -> None:
-        """Show the ProtonDB rating on the details page (if it is that game's)"""
+        """Show the ProtonDB rating on the details page and the banner"""
+        if game is not None and game is self.hero.game:
+            self.hero.sync()
         shown = getattr(self, "active_game", None)
         if shown is None or (game is not None and game is not shown):
             return

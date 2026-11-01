@@ -120,7 +120,8 @@ class Game(GObject.Object):
         self.protondb_checked = ok  # After a network failure the next bind asks again
         if self.widget is not None:
             self.widget.update_protondb()
-        shared.win.update_details_protondb(self)
+        if shared.win is not None:
+            shared.win.update_details_protondb(self)
 
     def launch(self) -> None:
         self.last_played = int(time())

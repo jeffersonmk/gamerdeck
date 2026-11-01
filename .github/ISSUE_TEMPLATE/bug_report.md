@@ -24,12 +24,12 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Logs**
-If applicable, attatch your logs from `Main Menu > About Cartridges > Troubleshooting > Debugging Information` to the issue.
+If applicable, attatch your logs from `Main Menu > About Gamerdeck > Troubleshooting > Debugging Information` to the issue.
 
 **System (please complete the following information):**
  - OS: [e.g. Fedora Linux]
  - Installation method [e.g. Flatpak]
- - Cartridges version [e.g. 1.5.4]
+ - Gamerdeck version [e.g. 1.5.4]
 
 **Additional context**
 Add any other context about the problem here.
