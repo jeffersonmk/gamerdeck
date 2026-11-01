@@ -1,8 +1,3 @@
-:root {
-  --accent-color: var(--purple-1);
-  --accent-bg-color: var(--purple-4);
-}
-
 #details_view {
     background-color: black;
 }

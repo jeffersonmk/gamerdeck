@@ -333,7 +333,15 @@ template $CartridgesWindow: Adw.ApplicationWindow {
       transition-type: slide_up;
       reveal-child: false;
 
-      $HintBar hint_bar {}
+      Box {
+        styles [
+          "hint-strip",
+        ]
+
+        $HintBar hint_bar {
+          hexpand: true;
+        }
+      }
     }
   }
 }

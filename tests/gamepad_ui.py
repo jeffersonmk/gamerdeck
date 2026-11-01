@@ -248,6 +248,20 @@ def steps(app):
     shared.schema.set_string("hints-style", "xbox")
     yield 300
     check("the legend shows with 'always'", win.hint_revealer.get_reveal_child())
+    # The strip that has the background and the line on top must be as wide as
+    # the window (the legend is centered in it), not a box around the symbols
+    strip = win.hint_bar.get_parent()
+    while strip is not None and not strip.has_css_class("hint-strip"):
+        strip = strip.get_parent()
+    check("the legend has a strip as wide as the window",
+          strip is not None and strip.get_width() == win.get_width()
+          and win.hint_bar.get_width() < strip.get_width())
+    strip = strip or win.hint_bar.get_parent()
+    first, last = win.hint_bar.get_first_child(), win.hint_bar.get_last_child()
+    gap_left = first.compute_bounds(strip)[1].get_x()
+    gap_right = strip.get_width() - (last.compute_bounds(strip)[1].get_x() + last.get_width())
+    check(f"the legend is centered in the strip (gaps {gap_left:.0f} and {gap_right:.0f} px)",
+          abs(gap_left - gap_right) <= 2)
     check("the library legend", legend() == ["Play", "Menu", "Search", "Sources", "Sidebar"])
     check("Xbox symbols", glyphs()[:3] == ["A", "X", "Y"])
     shared.schema.set_string("hints-style", "playstation")

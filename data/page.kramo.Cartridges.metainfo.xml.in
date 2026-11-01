@@ -31,20 +31,20 @@
   </requires>
   <screenshots>
     <screenshot type="default">
-      <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/1.png</image>
-      <caption>Gamerdeck</caption>
+      <image>https://raw.githubusercontent.com/jeffersonmk/gamerdeck/main/data/screenshots/1.png</image>
+      <caption>The library, with the banner of the game in focus, the games played last and the controller legend</caption>
     </screenshot>
     <screenshot>
-      <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/2.png</image>
-      <caption>Game Details</caption>
+      <image>https://raw.githubusercontent.com/jeffersonmk/gamerdeck/main/data/screenshots/2.png</image>
+      <caption>A game page, with the ProtonDB rating and the app it came from</caption>
     </screenshot>
     <screenshot>
-      <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/3.png</image>
-      <caption>Edit Game Details</caption>
+      <image>https://raw.githubusercontent.com/jeffersonmk/gamerdeck/main/data/screenshots/3.png</image>
+      <caption>The sources, in light mode, with PlayStation symbols</caption>
     </screenshot>
     <screenshot>
-      <image>https://codeberg.org/kramo/cartridges/raw/branch/main/data/screenshots/4.png</image>
-      <caption>Preferences</caption>
+      <image>https://raw.githubusercontent.com/jeffersonmk/gamerdeck/main/data/screenshots/4.png</image>
+      <caption>Preferences: controller hints and ProtonDB</caption>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1" />

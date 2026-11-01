@@ -220,6 +220,31 @@ class FamilyOfTheControllerInUseTests(unittest.TestCase):
         self.assertEqual(controller.family, hints.XBOX)
 
 
+class StyleSheetTests(unittest.TestCase):
+    def test_the_style_sheets_do_not_force_an_accent_color(self):
+        """Buttons, the banner and the focus ring follow the accent color of the system"""
+        from gi.repository import Gio
+
+        from cartridges import shared
+
+        for name in ("style.css", "style-dark.css"):
+            try:
+                css = bytes(Gio.resources_lookup_data(f"{shared.PREFIX}/{name}", 0).get_data()).decode()
+            except Exception:  # pylint: disable=broad-exception-caught
+                continue  # not part of the resources of this build
+            self.assertNotIn("--accent-color", css, name)
+            self.assertNotIn("--accent-bg-color", css, name)
+            self.assertNotIn("purple", css, name)
+
+    def test_the_main_style_sheet_was_found(self):
+        from gi.repository import Gio
+
+        from cartridges import shared
+
+        data = Gio.resources_lookup_data(f"{shared.PREFIX}/style.css", 0)
+        self.assertIn(b"hint-strip", bytes(data.get_data()))  # the test above looked at the real one
+
+
 class RecentGamesTests(unittest.TestCase):
     def test_newest_first_and_never_played_games_are_left_out(self):
         games = [make_game("old", 10), make_game("never", 0), make_game("new", 30), make_game("mid", 20)]

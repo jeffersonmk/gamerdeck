@@ -8,12 +8,25 @@
 
   A GTK4 + Libadwaita game launcher, for big libraries and for the couch
 
-  <img src="data/screenshots/1.png">
+  <img src="data/screenshots/1.png" alt="The library of Gamerdeck: a banner with the game in focus, the games played last, the grid with platform and ProtonDB badges, and the controller legend">
 </div>
 
 # The Project
 
 Gamerdeck is an easy-to-use, elegant game launcher written in Python using GTK4 and Libadwaita. It is a fork of Cartridges, made to run well with big libraries and with a controller.
+
+## Screenshots
+
+These are the app itself, taken on a demo library of made-up games with covers drawn for it. The accent color is the one of the system (here, blue).
+
+| | |
+|---|---|
+| <img src="data/screenshots/2.png" alt="A game page with the ProtonDB rating"> | <img src="data/screenshots/4.png" alt="The preferences: controller hints and ProtonDB"> |
+| **A game page.** The ProtonDB rating and the app it came from, one click away | **Preferences.** The controller legend and the ProtonDB switch |
+
+<img src="data/screenshots/3.png" alt="Light mode, with the list of sources and PlayStation symbols in the legend">
+
+**Light mode, with the list of sources (Steam, Heroic, Lutris, Faugus...) and the legend with PlayStation symbols.** The library, the banner and the badges follow the theme of the system.
 
 ## What is different from Cartridges
 
