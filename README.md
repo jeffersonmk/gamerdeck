@@ -1,5 +1,7 @@
 > [!NOTE]
 > Gamerdeck is a fork of [Cartridges](https://apps.gnome.org/Cartridges/) by kramo, which is no longer actively maintained upstream. This fork keeps the application id and the data folders of Cartridges, so an existing library and its settings keep working.
+>
+> Gamerdeck is for **Linux only**. The Windows and macOS builds of Cartridges are not part of this fork and are not maintained.
 
 <div align="center">
   <img src="data/icons/hicolor/scalable/apps/page.kramo.Cartridges.svg" width="128" height="128">
@@ -17,7 +19,7 @@ Gamerdeck is an easy-to-use, elegant game launcher written in Python using GTK4 
 
 ## Screenshots
 
-These are the app itself, taken on a demo library of made-up games with covers drawn for it. The accent color is the one of the system (here, blue).
+These are the app itself, taken on a demo library of made-up games with covers drawn for it. The accent color is the one of the system (here, blue). The controller legend is set to "Always" in these pictures, so it shows without a controller in use.
 
 | | |
 |---|---|
@@ -79,7 +81,7 @@ The platform comes from the source of the game: Steam, Lutris, Faugus, Bottles, 
 
 The top of the library shows a banner with the game that has the focus (or the pointer): its cover, developer, last played date, the platform it came from (click to open the app), its ProtonDB rating, and **Play** and **Details** buttons. Below it, **Continue Playing** lists the games played last. The banner follows the system accent color, in light and dark mode, and gives way to the search results while you search. Windows shorter than 860 px hide the recent games row, and narrow ones (below 565 px) use a compact banner.
 
-At the bottom of the window, a legend shows what each controller button does right now (library, sidebar, card menu, dialog, search, details page), drawn with the symbols of the controller you are using: A B X Y for Xbox, ✕ ○ □ △ for PlayStation. In the preferences, **Controller** lets you show it only when a controller is connected (the default), always, or never, and choose the Xbox or PlayStation symbols instead of following the controller in use.
+At the bottom of the window, a legend shows what each controller button does right now (library, sidebar, card menu, dialog, search, details page), drawn with the symbols of the controller you are using: A B X Y for Xbox, ✕ ○ □ △ for PlayStation. In the preferences, **Controller** lets you show it only while you use a controller (the default: it appears with the next button press and goes away when you go back to the mouse or the keyboard), always, or never, and choose the Xbox or PlayStation symbols instead of following the controller in use.
 
 ## Controller support
 
@@ -147,13 +149,26 @@ Blueprint files are not recompiled by `ninja` after an edit: run `rm -rf _build`
 
 # Installation
 
-Gamerdeck is installed as a **Flatpak**. It has its own id, `io.github.jeffersonmk.Gamerdeck`, so it never mixes with Cartridges: you can have both, and each one keeps its own library and settings. Gamerdeck has no packaged releases yet, so first you get the file `Gamerdeck.flatpak` (step 1).
+There are two ways to install Gamerdeck on Linux. Pick **one**:
+
+| | Flatpak | From source |
+|---|---|---|
+| What you need | Flatpak (the file `Gamerdeck.flatpak` of each [release](https://github.com/jeffersonmk/gamerdeck/releases)) | The source code (`git clone`, or "Source code" of a release) and the [requirements](#2-install-the-requirements) |
+| Works on | any distribution | any distribution that has GTK 4.15 and libadwaita 1.6 or newer |
+| Installed with | `scripts/install-flatpak.sh` | `scripts/install-source.sh` |
+| Removed with | `scripts/uninstall-flatpak.sh` | `scripts/uninstall-source.sh` |
+| Library | its own, in `~/.var/app/io.github.jeffersonmk.Gamerdeck` | the same folder Cartridges uses, `~/.local/share/cartridges` (nothing to copy) |
+| Sandbox | yes, with wide file access ([details](#what-the-flatpak-can-access)) | no: it runs like any program of your system |
+
+Both need no `sudo`: everything goes to your user folders. Both use the id `io.github.jeffersonmk.Gamerdeck`, so they never mix with Cartridges. They share the id with each other, too: with both installed the menu shows only one of them. The Flatpak lives next to Cartridges; the installation from source does not (it takes over the `cartridges` command, so the script stops if Cartridges is already installed).
+
+## Flatpak
 
 You need Flatpak with the Flathub repository (most distributions have it; see [flatpak.org/setup](https://flatpak.org/setup/)). Nothing here needs `sudo`: everything is installed for your user only.
 
-## 1. Get the `Gamerdeck.flatpak` file
+### 1. Get the `Gamerdeck.flatpak` file
 
-Build it from the source code. The first time it downloads about 1 GB (the GNOME SDK, once) and takes a few minutes; the next builds are much faster.
+Download it from the Releases page, or build it from the source code. The first time it downloads about 1 GB (the GNOME SDK, once) and takes a few minutes; the next builds are much faster.
 
 ```sh
 git clone https://github.com/jeffersonmk/gamerdeck.git
@@ -164,7 +179,7 @@ scripts/build-flatpak.sh
 
 This creates `Gamerdeck.flatpak` in the project folder (about 2 MB). The file can be copied to another computer with Flatpak.
 
-## 2. Install
+### 2. Install
 
 ```sh
 scripts/install-flatpak.sh
@@ -178,7 +193,7 @@ Gamerdeck appears in the applications menu, with its icon. Flatpak creates that 
 flatpak run io.github.jeffersonmk.Gamerdeck
 ```
 
-### Bring your library from Cartridges (optional)
+#### Bring your library from Cartridges (optional)
 
 Gamerdeck starts with an empty library. To keep the one you already have from Cartridges, close both apps and copy its data folder into the one of Gamerdeck:
 
@@ -189,7 +204,7 @@ cp -a ~/.local/share/cartridges/. ~/.var/app/io.github.jeffersonmk.Gamerdeck/dat
 
 If you used the Flatpak of Cartridges, copy from `~/.var/app/page.kramo.Cartridges/data/cartridges/.` instead. The games and covers come along; the settings (like the SteamGridDB key) do not, so set them again in the preferences. The copy leaves the original untouched.
 
-## Update
+### Update
 
 Get the new `Gamerdeck.flatpak` (`git pull` and `scripts/build-flatpak.sh` again, or the file someone gave you) and run the same install command:
 
@@ -201,7 +216,7 @@ scripts/install-flatpak.sh
 
 Your library and settings stay. If the script says that this exact version is already installed, you already have it.
 
-## Uninstall
+### Uninstall
 
 ```sh
 scripts/uninstall-flatpak.sh
@@ -221,7 +236,7 @@ flatpak uninstall --unused
 rm -r .flatpak-builder .flatpak-repo .flatpak-build               # inside the project folder
 ```
 
-## What the Flatpak can access
+### What the Flatpak can access
 
 - **Your files** (`--filesystem=host`): to read the libraries of Steam, Lutris, Heroic and the others, and to find the games you add.
 - **The network:** to download covers and ProtonDB ratings.
@@ -230,18 +245,66 @@ rm -r .flatpak-builder .flatpak-repo .flatpak-build               # inside the p
 
 You can see and change these permissions with [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal).
 
-## Without Flatpak (for developers)
+## From source
+
+### 1. Get the source code
 
 ```sh
-meson setup build --prefix="$HOME/.local" -Dapp_id=io.github.jeffersonmk.Gamerdeck
-ninja -C build install
+git clone https://github.com/jeffersonmk/gamerdeck.git
+cd gamerdeck
 ```
 
-`-Dapp_id` gives it the same id as the Flatpak instead of the one of Cartridges, so it has its own launcher, icon and settings. Without Flatpak the library is the same folder Cartridges uses, `~/.local/share/cartridges`. It needs the requirements below. To remove it, delete the files listed in `build/meson-logs/install-log.txt` (Meson has no `uninstall`).
+(Or download "Source code" from a release, extract it and open a terminal in that folder.)
 
-**Requirements:** Meson and Ninja, [blueprint-compiler](https://gitlab.gnome.org/jwestman/blueprint-compiler), GTK 4 ≥ 4.15, libadwaita ≥ 1.6, PyGObject, PyYAML, requests and Pillow. Optional: libmanette (controller support) and pycairo (the PlayStation symbols; without it the app uses font symbols).
+### 2. Install the requirements
 
-See [CONTRIBUTING.md](CONTRIBUTING.md#building) for GNOME Builder, Windows and macOS. The Windows and macOS installers are built by the workflows in `.github/workflows`, which have not been run for this fork.
+- **To run it:** GTK 4.15 or newer, libadwaita 1.6 or newer, PyGObject, PyYAML, requests and Pillow. Optional: libmanette (controller support) and pycairo (the PlayStation symbols; without it the app uses font symbols).
+- **To build it:** Meson, Ninja, [blueprint-compiler](https://gitlab.gnome.org/jwestman/blueprint-compiler) (if it is missing, Meson downloads it with git), gettext and desktop-file-utils.
+
+On Arch Linux and CachyOS (tested):
+
+```sh
+sudo pacman -S --needed meson blueprint-compiler gettext desktop-file-utils gtk4 libadwaita libmanette python-gobject python-yaml python-requests python-pillow
+```
+
+On other distributions the names change (for example `python3-gobject`, `python3-pyyaml` and `libmanette` on Fedora; `python3-gi`, `gir1.2-adw-1`, `gir1.2-manette-0.2` on Debian and Ubuntu; these were not tested). The script checks everything before building and says what is missing.
+
+### 3. Install
+
+```sh
+scripts/install-source.sh
+```
+
+It builds the app and installs it in `~/.local`: the command, the icon and the shortcut of the applications menu (with the whole path of the command, so it works even if `~/.local/bin` is not in your `PATH`). Gamerdeck appears in the menu, and you can start it from a terminal with `~/.local/bin/gamerdeck`. For the plain `gamerdeck` command, put `~/.local/bin` in your `PATH` (fish: `fish_add_path ~/.local/bin`).
+
+It writes the list of every file it installed, which is how the uninstall script removes them (Meson has no `uninstall`).
+
+Your library is the folder Cartridges uses, `~/.local/share/cartridges`, so it is already there. The settings start empty, so set them again in the preferences. If Cartridges is installed, the script stops with a message: Gamerdeck would replace its command and its Python files. Remove Cartridges first, or use the Flatpak.
+
+### Update
+
+```sh
+git pull
+scripts/install-source.sh
+```
+
+The library and the settings stay. Files that the old version had and the new one does not are removed. After an update of Python to a new version (for example 3.14 to 3.15), run the script again, because the Python files go to a folder named after the version.
+
+### Uninstall
+
+```sh
+scripts/uninstall-source.sh
+```
+
+It removes exactly the files the installation listed (and the empty folders they leave behind), nothing else, then asks if you also want to delete your library and settings. Careful: that library is the folder of Cartridges too. To skip the question, use `--keep-data` or `--delete-data`. Your games and the data of Steam, Lutris and the other launchers are never touched.
+
+To also remove the build folder: `rm -r .build-source` inside the project.
+
+### Installing somewhere else (advanced)
+
+`scripts/install-source.sh --prefix DIR` and `scripts/uninstall-source.sh --prefix DIR` use another folder instead of `~/.local`. The app only finds its files if that folder is in the search paths of your system (`PYTHONPATH` and `XDG_DATA_DIRS`), so this is meant for tests.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#building) for GNOME Builder and plain Meson.
 
 # Contributing
 

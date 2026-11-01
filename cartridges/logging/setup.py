@@ -103,7 +103,6 @@ def log_system_info() -> None:
         )
         logging.debug("Flatpak version: %s", process.stdout.rstrip())
     logging.debug("Platform: %s", platform.platform())
-    if os.name == "posix":
-        for key, value in platform.uname()._asdict().items():
-            logging.debug("\t%s: %s", key.title(), value)
+    for key, value in platform.uname()._asdict().items():
+        logging.debug("\t%s: %s", key.title(), value)
     logging.debug("─" * 37)

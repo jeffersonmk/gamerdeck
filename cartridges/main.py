@@ -97,10 +97,6 @@ class CartridgesApplication(Adw.Application):
 
         self.add_main_option_entries((search, launch))
 
-        if sys.platform.startswith("darwin"):
-            if settings := Gtk.Settings.get_default():
-                settings.props.gtk_decoration_layout = "close,minimize,maximize:"
-
     def do_activate(self) -> None:  # pylint: disable=arguments-differ
         """Called on app creation"""
         try:
@@ -437,11 +433,7 @@ class CartridgesApplication(Adw.Application):
             if action[1:2]:
                 self.set_accels_for_action(
                     f"app.{action[0]}" if scope == self else f"win.{action[0]}",
-                    (
-                        tuple(s.replace("<primary>", "<meta>") for s in action[1])
-                        if sys.platform.startswith("darwin")
-                        else action[1]
-                    ),
+                    action[1],
                 )
 
             scope.add_action(simple_action)

@@ -220,6 +220,10 @@ class GamepadController:
         self.monitor = None
         self.devices: set = set()
         self.last_device: Any = None  # The one used last: its symbols are shown
+        # True while the controller is what the user is playing with, False after
+        # the mouse or the keyboard were used (the legend follows it)
+        self.in_use = False
+        self.last_input = 0  # When the controller last moved something (µs, monotonic)
 
     def start(self) -> bool:
         if Manette is None:
@@ -249,6 +253,13 @@ class GamepadController:
             return hints.XBOX
         return hints.controller_family(device.get_name() or "", device.get_guid() or "")
 
+    def set_in_use(self, in_use: bool) -> None:
+        """The controller took over (True) or the mouse or keyboard did (False)"""
+        if in_use == self.in_use:
+            return
+        self.in_use = in_use
+        self._hints_changed()
+
     def _hints_changed(self) -> None:
         win = getattr(self.app, "get_active_window", lambda: None)()
         if win is not None and hasattr(win, "update_hints"):
@@ -270,6 +281,8 @@ class GamepadController:
         self.devices.discard(device)
         if self.last_device is device:
             self.last_device = None
+        if not self.devices:
+            self.in_use = False
         self.input.release_all()
         self._hints_changed()
         logging.info("Gamepad disconnected: %s", device.get_name())
@@ -304,6 +317,8 @@ class GamepadController:
             self.input.release_all()
             return
 
+        self.last_input = GLib.get_monotonic_time()
+        self.set_in_use(True)
         win.set_focus_visible(True)
         match action:
             case Action.UP | Action.DOWN | Action.LEFT | Action.RIGHT:

@@ -39,5 +39,4 @@ def run_executable(executable) -> None:
         cwd=shared.home,
         shell=True,
         start_new_session=True,
-        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,  # type: ignore
     )

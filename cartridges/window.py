@@ -19,7 +19,6 @@
 
 # pyright: reportAssignmentType=none
 
-from sys import platform
 from typing import Any, Optional
 
 from cartridges import shared
@@ -253,9 +252,6 @@ class CartridgesWindow(Adw.ApplicationWindow):
             "clicked", self.on_details_protondb_clicked
         )
 
-        if platform == "darwin":
-            self.sidebar_navigation_page.set_title("")
-
         self.details_view.set_measure_overlay(self.details_view_toolbar_view, True)
         self.details_view.set_clip_overlay(self.details_view_toolbar_view, False)
 
@@ -301,6 +297,7 @@ class CartridgesWindow(Adw.ApplicationWindow):
         self._hero_timeout = 0
         self._header_timeout = 0
         self.connect("notify::focus-widget", self.update_hints)
+        self.setup_input_tracking()
         self.navigation_view.connect("notify::visible-page", self.on_page_changed)
         for search_bar in (self.search_bar, self.hidden_search_bar):
             search_bar.connect("notify::search-mode-enabled", self.on_page_changed)
@@ -639,13 +636,69 @@ class CartridgesWindow(Adw.ApplicationWindow):
         gamepad = self.get_application().gamepad if self.get_application() else None
         return gamepad.family if gamepad else hints.XBOX
 
+    # Pointer movement of at least this many pixels counts as using the mouse
+    POINTER_THRESHOLD = 12
+    # The controller scrolls or moves things under a pointer that stays still;
+    # whatever the pointer reports this soon after is not the user (µs)
+    POINTER_GRACE = 300_000
+
+    def setup_input_tracking(self) -> None:
+        """Tell the controller handler when the mouse or the keyboard are used
+
+        The legend is for the controller: it hides when the user goes back to the
+        mouse or the keyboard and comes back with the next button press.
+        """
+        self._pointer_at: Optional[tuple[float, float]] = None
+
+        keys = Gtk.EventControllerKey()
+        clicks = Gtk.GestureClick()
+        scroll = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.BOTH_AXES)
+        motion = Gtk.EventControllerMotion()
+        keys.connect("key-pressed", self.on_other_input_key)
+        clicks.connect("pressed", self.on_other_input_click)
+        scroll.connect("scroll", self.on_other_input_scroll)
+        motion.connect("motion", self.on_other_input_motion)
+        self.input_controllers = (keys, clicks, scroll, motion)
+        for controller in self.input_controllers:
+            # Look first, never consume: the widgets get the events as before
+            controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+            self.add_controller(controller)
+
+    def mouse_or_keyboard_used(self) -> None:
+        gamepad = getattr(self.get_application(), "gamepad", None)
+        if gamepad is not None:
+            gamepad.set_in_use(False)
+
+    def on_other_input_key(self, *_args: Any) -> bool:
+        self.mouse_or_keyboard_used()
+        return Gdk.EVENT_PROPAGATE
+
+    def on_other_input_click(self, *_args: Any) -> None:
+        self.mouse_or_keyboard_used()
+
+    def on_other_input_scroll(self, *_args: Any) -> bool:
+        self.mouse_or_keyboard_used()
+        return Gdk.EVENT_PROPAGATE
+
+    def on_other_input_motion(self, _controller: Any, x: float, y: float) -> None:
+        last, self._pointer_at = self._pointer_at, (x, y)
+        if last is None or (x - last[0]) ** 2 + (y - last[1]) ** 2 < self.POINTER_THRESHOLD**2:
+            return
+        gamepad = getattr(self.get_application(), "gamepad", None)
+        if gamepad is not None and GLib.get_monotonic_time() - gamepad.last_input < self.POINTER_GRACE:
+            self._pointer_at = last  # Keep the old point: this was not the user
+            return
+        self.mouse_or_keyboard_used()
+
     def update_hints(self, *_args: Any) -> None:
         """Show, hide and describe the controller button legend"""
         mode = shared.schema.get_string("hints-mode")
         app = self.get_application()
         gamepad = getattr(app, "gamepad", None)
-        connected = bool(gamepad and gamepad.devices)
-        visible = mode == "always" or (mode != "never" and connected)
+        # "auto": only while a controller is connected AND is what the user is
+        # using, so it goes away when they go back to the mouse or the keyboard
+        in_use = bool(gamepad and gamepad.devices and gamepad.in_use)
+        visible = mode == "always" or (mode != "never" and in_use)
         self.hint_revealer.set_reveal_child(visible)
         if visible:
             self.hint_bar.set_hints(hints.hints_for(self.hint_context()), self.hint_style())

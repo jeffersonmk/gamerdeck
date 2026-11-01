@@ -81,7 +81,7 @@ class ItchSource(URLExecutableSource):
     name = _("itch")
     iterable_class = ItchSourceIterable
     url_format = "itch://caves/{cave_id}/launch"
-    available_on = {"linux", "win32", "darwin"}
+    available_on = {"linux"}
 
     locations: ItchLocations
 
@@ -94,8 +94,6 @@ class ItchSource(URLExecutableSource):
                     shared.flatpak_dir / "io.itch.itch" / "config" / "itch",
                     shared.config_dir / "itch",
                     shared.host_config_dir / "itch",
-                    shared.appdata_dir / "itch",
-                    shared.app_support_dir / "itch",
                 ),
                 paths={
                     "butler.db": LocationSubPath("db/butler.db"),

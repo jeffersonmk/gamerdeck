@@ -11,11 +11,7 @@ project(
 dependency('gtk4', version: '>= 4.15.0')
 dependency('libadwaita-1', version: '>= 1.6.beta')
 
-# Translations are broken on Windows for multiple reasons
-# gresources don't work and MSYS2 seems to have also broken the gettext package
-if host_machine.system() != 'windows'
-  i18n = import('i18n')
-endif
+i18n = import('i18n')
 
 gnome = import('gnome')
 python = import('python')
@@ -59,12 +55,8 @@ conf.set('libexecdir', libexecdir)
 subdir('data')
 subdir('cartridges')
 
-if host_machine.system() == 'windows'
-  subdir('build-aux/windows')
-else
-  subdir('search-provider')
-  subdir('po')
-endif
+subdir('search-provider')
+subdir('po')
 
 gnome.post_install(
   glib_compile_schemas: true,

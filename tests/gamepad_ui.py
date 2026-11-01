@@ -23,7 +23,7 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, GLib, Gtk  # noqa: E402
 
 from cartridges import main as app_main  # noqa: E402
 from cartridges import shared  # noqa: E402
@@ -243,7 +243,58 @@ def steps(app):
     check("the row lists the latest games, newest first",
           [win.rail.store.get_item(i).name for i in range(3)]
           == [f"Game {N_GAMES - 1 - i:02d}" for i in range(3)])
-    check("the legend is hidden when there is no controller", not win.hint_revealer.get_reveal_child())
+    # "auto": the legend shows only while a controller is connected AND in use.
+    # Real controllers of the machine that runs the test count, so use a fake one
+    # and judge by what the user did last.
+    class FakePad:
+        def get_name(self):
+            return "Fake Xbox Controller"
+
+        def get_guid(self):
+            return ""
+
+    pad = FakePad()
+    keys, clicks, scroll, motion = win.input_controllers
+    shown = win.hint_revealer.get_reveal_child
+
+    def use_controller():
+        ctl.set_in_use(True)
+        ctl.last_input = 0
+
+    ctl.devices.discard(pad)
+    ctl.set_in_use(False)
+    yield 100
+    check("no controller connected: the legend is hidden", not shown())
+    ctl.devices.add(pad)
+    ctl._hints_changed()
+    yield 100
+    check("a controller is connected but not in use: the legend is hidden", not shown())
+    use_controller()
+    yield 100
+    check("the controller is in use: the legend shows", shown())
+    keys.emit("key-pressed", Gdk.KEY_a, 0, Gdk.ModifierType(0))
+    check("a key of the keyboard hides it", not shown())
+    use_controller()
+    check("the controller brings it back", shown())
+    clicks.emit("pressed", 1, 5.0, 5.0)
+    check("a click hides it", not shown())
+    use_controller()
+    scroll.emit("scroll", 0.0, 1.0)
+    check("the mouse wheel hides it", not shown())
+    use_controller()
+    motion.emit("motion", 100.0, 100.0)
+    motion.emit("motion", 100.0, 100.0)
+    motion.emit("motion", 103.0, 101.0)
+    check("a pointer that stays (or twitches a few pixels) does not hide it", shown())
+    ctl.last_input = GLib.get_monotonic_time()
+    motion.emit("motion", 400.0, 100.0)
+    check("pointer movement right after the controller moved something does not hide it", shown())
+    ctl.last_input = 0
+    motion.emit("motion", 400.0, 100.0)
+    check("the pointer really moving hides it", not shown())
+    ctl.devices.discard(pad)
+    use_controller()
+    ctl.set_in_use(False)
     shared.schema.set_string("hints-mode", "always")
     shared.schema.set_string("hints-style", "xbox")
     yield 300

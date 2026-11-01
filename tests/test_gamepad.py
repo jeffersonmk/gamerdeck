@@ -195,6 +195,41 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(len(self.actions), count)
         self.assertFalse(controller.devices)
 
+    def test_the_controller_is_in_use_after_it_moves_something(self):
+        refreshed = []
+        win = SimpleNamespace(
+            is_active=lambda: True,
+            set_focus_visible=lambda _visible: None,
+            activate_action=lambda *_args: None,
+            update_hints=lambda: refreshed.append(True),
+        )
+        controller = GamepadController(SimpleNamespace(get_active_window=lambda: win))
+        self.assertFalse(controller.in_use)
+        controller.dispatch(Action.SEARCH)
+        self.assertTrue(controller.in_use)
+        self.assertGreater(controller.last_input, 0)
+        self.assertEqual(len(refreshed), 1)
+        controller.dispatch(Action.SEARCH)  # already in use: the legend is not redone
+        self.assertEqual(len(refreshed), 1)
+        controller.set_in_use(False)  # the mouse or the keyboard took over
+        self.assertFalse(controller.in_use)
+        self.assertEqual(len(refreshed), 2)
+        controller.set_in_use(False)
+        self.assertEqual(len(refreshed), 2)
+
+    def test_a_window_without_the_focus_does_not_put_the_controller_in_use(self):
+        controller = self.make(active=False)
+        controller.dispatch(Action.SEARCH)
+        self.assertFalse(controller.in_use)
+
+    def test_the_last_controller_leaving_ends_the_use(self):
+        controller = self.make()
+        device = FakeDevice()
+        controller._device_connected(None, device)
+        controller.in_use = True
+        controller._device_disconnected(None, device)
+        self.assertFalse(controller.in_use)
+
     def test_window_without_the_focus_is_ignored(self):
         controller = self.make(active=False)
         self.assertIsNone(controller.get_window())

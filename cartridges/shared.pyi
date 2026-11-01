@@ -61,12 +61,6 @@ flatpak_dir: Path
 games_dir: Path
 covers_dir: Path
 
-appdata_dir: Path
-local_appdata_dir: Path
-programfiles32_dir: Path
-
-app_support_dir: Path
-
 
 scale_factor: int
 image_size: int
