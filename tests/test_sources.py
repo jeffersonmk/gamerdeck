@@ -16,6 +16,7 @@ from cartridges.importer.faugus_source import (  # noqa: E402
     FaugusSource,
     parse_last_played,
 )
+from cartridges.importer.flatpak_source import FlatpakSource  # noqa: E402
 from cartridges.importer.importer import Importer  # noqa: E402
 from cartridges.importer.lutris_source import LutrisSource  # noqa: E402
 
@@ -37,6 +38,53 @@ def faugus_data(root, entries) -> None:
 
 def run_source(source) -> list:
     return list(iter(source))
+
+
+def flatpak_exports(root, apps) -> None:
+    """A Flatpak installation with the desktop entries it exports"""
+    applications = root / "exports" / "share" / "applications"
+    applications.mkdir(parents=True)
+    (root / "exports" / "share" / "icons").mkdir(parents=True)
+    for flatpak_id, name in apps.items():
+        (applications / f"{flatpak_id}.desktop").write_text(
+            "[Desktop Entry]\nType=Application\n"
+            f"Name={name}\nExec=flatpak run {flatpak_id}\n"
+            f"Categories=Game;\nX-Flatpak={flatpak_id}\n",
+            encoding="utf-8",
+        )
+
+
+class FlatpakOwnAppTests(unittest.TestCase):
+    """The app is not a game, under any of the ids it has been published with"""
+
+    def setUp(self):
+        shared.import_time = 1_700_000_000
+        for key in ("flatpak-system-location", "flatpak-user-location", "flatpak-import-launchers"):
+            self.addCleanup(shared.schema.reset, key)
+        system, user = fresh_dir("flatpak-system"), fresh_dir("flatpak-user")
+        flatpak_exports(system, {
+            "io.github.jeffersonmk.Gamerdeck": "Gamerdeck",
+            "page.kramo.Cartridges": "Cartridges",
+            "hu.kramo.Cartridges.Devel": "Cartridges (Devel)",
+            "org.example.Fun": "Fun Game",
+            "com.valvesoftware.Steam": "Steam",
+        })
+        flatpak_exports(user, {shared.APP_ID: "Whatever name it has"})
+        shared.schema.set_string("flatpak-system-location", str(system))
+        shared.schema.set_string("flatpak-user-location", str(user))
+
+    @staticmethod
+    def imported() -> list:
+        return sorted(game.name for game, _extra in run_source(FlatpakSource()))
+
+    def test_this_app_is_not_imported_as_a_game(self):
+        shared.schema.set_boolean("flatpak-import-launchers", False)
+        self.assertEqual(self.imported(), ["Fun Game"])
+
+    def test_nor_when_launchers_are_imported_too(self):
+        # Asking for launchers is asking for Steam and the like, not for this app
+        shared.schema.set_boolean("flatpak-import-launchers", True)
+        self.assertEqual(self.imported(), ["Fun Game", "Steam"])
 
 
 class FaugusTests(unittest.TestCase):

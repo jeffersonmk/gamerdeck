@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>@APP_ID@</id>
-  <replaces>
-    <id>hu.kramo.Cartridges</id>
-  </replaces>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>Gamerdeck</name>
@@ -11,20 +8,18 @@
   <description>
     <p>Gamerdeck is a simple game launcher for all of your games. It has support for importing games from Steam, Lutris, Heroic and more with no login necessary. You can sort and hide games or download cover art from SteamGridDB.</p>
   </description>
-  <url type="homepage">https://apps.gnome.org/Cartridges/</url>
-  <url type="bugtracker">https://git.kramo.page/cartridges/issues</url>
-  <url type="translate">https://hosted.weblate.org/engage/cartridges/</url>
-  <url type="contact">https://www.kramo.page/about/</url>
-  <url type="vcs-browser">https://git.kramo.page/cartridges</url>
-  <url type="contribute">https://git.kramo.page/cartridges/blob/main/CONTRIBUTING.md</url>
+  <url type="homepage">https://github.com/jeffersonmk/gamerdeck</url>
+  <url type="bugtracker">https://github.com/jeffersonmk/gamerdeck/issues</url>
+  <url type="vcs-browser">https://github.com/jeffersonmk/gamerdeck</url>
+  <url type="contribute">https://github.com/jeffersonmk/gamerdeck/blob/main/CONTRIBUTING.md</url>
   <developer id="page.kramo">
     <name translate="no">kramo</name>
   </developer>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <translation type="gettext">cartridges</translation>
   <branding>
-    <color type="primary" scheme_preference="light">#d5b0e7</color>
-    <color type="primary" scheme_preference="dark">#501a5c</color>
+    <color type="primary" scheme_preference="light">#b5d6f6</color>
+    <color type="primary" scheme_preference="dark">#1f3f66</color>
   </branding>
   <supports>
     <control>pointing</control>

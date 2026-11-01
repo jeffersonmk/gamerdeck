@@ -8,6 +8,12 @@ option(
   value: 'release'
 )
 option(
+  'app_id',
+  type: 'string',
+  value: '',
+  description: 'Application id to build with, instead of the one of the profile (e.g. for the Flatpak)'
+)
+option(
   'tiff_compression',
   type: 'combo',
   choices: [

@@ -35,6 +35,15 @@ elif profile == 'release'
   prefix = '/page/kramo/Cartridges'
 endif
 
+# The icons are named after the id of the profile; another id reuses them
+icon_name = app_id
+
+custom_app_id = get_option('app_id')
+if custom_app_id != ''
+  app_id = custom_app_id
+  prefix = '/' + app_id.replace('.', '/')
+endif
+
 conf = configuration_data()
 conf.set('PYTHON', py_installation.full_path())
 conf.set('PYTHON_VERSION', py_installation.language_version())

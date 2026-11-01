@@ -134,14 +134,99 @@ Blueprint files are not recompiled by `ninja` after an edit: run `rm -rf _build`
 
 # Installation
 
-Gamerdeck has no packaged releases yet, so it is built from source.
+Gamerdeck is installed as a **Flatpak**. It has its own id, `io.github.jeffersonmk.Gamerdeck`, so it never mixes with Cartridges: you can have both, and each one keeps its own library and settings. Gamerdeck has no packaged releases yet, so first you get the file `Gamerdeck.flatpak` (step 1).
 
-**Requirements:** Meson and Ninja, [blueprint-compiler](https://gitlab.gnome.org/jwestman/blueprint-compiler), GTK 4 ≥ 4.15, libadwaita ≥ 1.6, PyGObject, PyYAML, requests and Pillow. Optional: libmanette (controller support) and pycairo (the PlayStation symbols; without it the app uses font symbols).
+You need Flatpak with the Flathub repository (most distributions have it; see [flatpak.org/setup](https://flatpak.org/setup/)). Nothing here needs `sudo`: everything is installed for your user only.
+
+## 1. Get the `Gamerdeck.flatpak` file
+
+Build it from the source code. The first time it downloads about 1 GB (the GNOME SDK, once) and takes a few minutes; the next builds are much faster.
 
 ```sh
-meson setup build
+git clone https://github.com/jeffersonmk/gamerdeck.git
+cd gamerdeck
+flatpak install --user flathub org.flatpak.Builder   # only the first time
+scripts/build-flatpak.sh
+```
+
+This creates `Gamerdeck.flatpak` in the project folder (about 2 MB). The file can be copied to another computer with Flatpak.
+
+## 2. Install
+
+```sh
+scripts/install-flatpak.sh
+```
+
+(Without the project folder, `flatpak install --user Gamerdeck.flatpak` does the same.)
+
+Gamerdeck appears in the applications menu, with its icon. Flatpak creates that shortcut by itself. You can also start it from a terminal:
+
+```sh
+flatpak run io.github.jeffersonmk.Gamerdeck
+```
+
+### Bring your library from Cartridges (optional)
+
+Gamerdeck starts with an empty library. To keep the one you already have from Cartridges, close both apps and copy its data folder into the one of Gamerdeck:
+
+```sh
+mkdir -p ~/.var/app/io.github.jeffersonmk.Gamerdeck/data/cartridges
+cp -a ~/.local/share/cartridges/. ~/.var/app/io.github.jeffersonmk.Gamerdeck/data/cartridges/
+```
+
+If you used the Flatpak of Cartridges, copy from `~/.var/app/page.kramo.Cartridges/data/cartridges/.` instead. The games and covers come along; the settings (like the SteamGridDB key) do not, so set them again in the preferences. The copy leaves the original untouched.
+
+## Update
+
+Get the new `Gamerdeck.flatpak` (`git pull` and `scripts/build-flatpak.sh` again, or the file someone gave you) and run the same install command:
+
+```sh
+git pull
+scripts/build-flatpak.sh
+scripts/install-flatpak.sh
+```
+
+Your library and settings stay. If the script says that this exact version is already installed, you already have it.
+
+## Uninstall
+
+```sh
+scripts/uninstall-flatpak.sh
+```
+
+It removes the app and the shortcut, then asks if you also want to delete the data Gamerdeck saved for itself (library, covers, settings and logs, in `~/.var/app/io.github.jeffersonmk.Gamerdeck`). To skip the question, use `--keep-data` or `--delete-data`. Your games and the data of Steam, Lutris and the other launchers are never touched. Without the script:
+
+```sh
+flatpak uninstall --user --delete-data io.github.jeffersonmk.Gamerdeck
+```
+
+To also free the space used by what building needed (about 2.7 GB) and by runtimes nobody else uses:
+
+```sh
+flatpak uninstall --user org.flatpak.Builder org.gnome.Sdk//50   # only if you will not build again
+flatpak uninstall --unused
+rm -r .flatpak-builder .flatpak-repo .flatpak-build               # inside the project folder
+```
+
+## What the Flatpak can access
+
+- **Your files** (`--filesystem=host`): to read the libraries of Steam, Lutris, Heroic and the others, and to find the games you add.
+- **The network:** to download covers and ProtonDB ratings.
+- **The input devices:** to read your controller.
+- **The Flatpak service of the host** (`--talk-name=org.freedesktop.Flatpak`): to start your games outside the sandbox.
+
+You can see and change these permissions with [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal).
+
+## Without Flatpak (for developers)
+
+```sh
+meson setup build --prefix="$HOME/.local" -Dapp_id=io.github.jeffersonmk.Gamerdeck
 ninja -C build install
 ```
+
+`-Dapp_id` gives it the same id as the Flatpak instead of the one of Cartridges, so it has its own launcher, icon and settings. Without Flatpak the library is the same folder Cartridges uses, `~/.local/share/cartridges`. It needs the requirements below. To remove it, delete the files listed in `build/meson-logs/install-log.txt` (Meson has no `uninstall`).
+
+**Requirements:** Meson and Ninja, [blueprint-compiler](https://gitlab.gnome.org/jwestman/blueprint-compiler), GTK 4 ≥ 4.15, libadwaita ≥ 1.6, PyGObject, PyYAML, requests and Pillow. Optional: libmanette (controller support) and pycairo (the PlayStation symbols; without it the app uses font symbols).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#building) for GNOME Builder, Windows and macOS. The Windows and macOS installers are built by the workflows in `.github/workflows`, which have not been run for this fork.
 

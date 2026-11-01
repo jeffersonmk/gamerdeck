@@ -11,3 +11,6 @@ build-aux/flatpak/page.kramo.Cartridges.json
 /_install
 __pycache__/
 /subprojects/.wraplock
+/.flatpak-repo
+/.flatpak-build
+*.flatpak

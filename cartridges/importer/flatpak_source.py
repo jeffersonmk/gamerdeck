@@ -47,19 +47,20 @@ class FlatpakSourceIterable(SourceIterable):
             return
 
         import_launchers = shared.schema.get_boolean("flatpak-import-launchers")
+        # This app, under every id it has been published with
+        own_apps = {
+            "hu.kramo.Cartridges",
+            "hu.kramo.Cartridges.Devel",
+            "page.kramo.Cartridges",
+            "page.kramo.Cartridges.Devel",
+            "io.github.jeffersonmk.Gamerdeck",
+            shared.APP_ID,
+        }
         blacklist = (
-            {
-                "hu.kramo.Cartridges",
-                "hu.kramo.Cartridges.Devel",
-                "page.kramo.Cartridges",
-                "page.kramo.Cartridges.Devel",
-            }
+            own_apps
             if import_launchers
             else {
-                "hu.kramo.Cartridges",
-                "hu.kramo.Cartridges.Devel",
-                "page.kramo.Cartridges",
-                "page.kramo.Cartridges.Devel",
+                *own_apps,
                 "com.valvesoftware.Steam",
                 "net.lutris.Lutris",
                 "com.heroicgameslauncher.hgl",
