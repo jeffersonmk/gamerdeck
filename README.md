@@ -320,4 +320,4 @@ Cartridges' contributors stand with Palestine, Ukraine and all other victims of 
 
 # Credits and license
 
-Gamerdeck is based on [Cartridges](https://apps.gnome.org/Cartridges/) by kramo and its contributors, and is licensed under the GPL-3.0-or-later like it (see [LICENSE](LICENSE)). The original author accepts donations through [GitHub Sponsors](https://github.com/sponsors/kra-mo) and [Liberapay](https://liberapay.com/kramo).
+Gamerdeck is made and maintained by [jeffersonmk](https://github.com/jeffersonmk). It is based on [Cartridges](https://apps.gnome.org/Cartridges/) by kramo and its contributors, and is licensed under the GPL-3.0-or-later like it (see [LICENSE](LICENSE)). The original author accepts donations through [GitHub Sponsors](https://github.com/sponsors/kra-mo) and [Liberapay](https://liberapay.com/kramo).

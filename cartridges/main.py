@@ -285,6 +285,7 @@ class CartridgesApplication(Adw.Application):
         )
         about.set_developers(
             (
+                "jeffersonmk https://github.com/jeffersonmk",
                 "kramo https://kramo.page",
                 "Geoffrey Coulaud https://geoffrey-coulaud.fr",
                 "Rilic https://rilic.red",
@@ -296,8 +297,10 @@ class CartridgesApplication(Adw.Application):
                 "Sabri Ünal https://github.com/sabriunal",
             )
         )
-        about.set_designers(("kramo https://kramo.page",))
-        about.set_copyright("© 2022-2024 kramo")
+        about.set_designers(
+            ("jeffersonmk https://github.com/jeffersonmk", "kramo https://kramo.page")
+        )
+        about.set_copyright("© 2026 jeffersonmk, © 2022-2024 kramo")
         # Translators: Replace this with Your Name, Your Name <your.email@example.com>, or Your Name https://your-site.com for it to show up in the About dialog.
         about.set_translator_credits(_("translator-credits"))
         about.set_debug_info(debug_str)

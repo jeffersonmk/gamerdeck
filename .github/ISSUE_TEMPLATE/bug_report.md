@@ -29,7 +29,7 @@ If applicable, attatch your logs from `Main Menu > About Gamerdeck > Troubleshoo
 **System (please complete the following information):**
  - OS: [e.g. Fedora Linux]
  - Installation method [e.g. Flatpak]
- - Gamerdeck version [e.g. 1.5.4]
+ - Gamerdeck version [e.g. 1.0.0]
 
 **Additional context**
 Add any other context about the problem here.
