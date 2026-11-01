@@ -36,6 +36,7 @@ from gi.repository import Adw, Gio, GLib, Gtk
 from cartridges import shared
 from cartridges.details_dialog import DetailsDialog
 from cartridges.game import Game
+from cartridges.gamepad import GamepadController
 from cartridges.importer.bottles_source import BottlesSource
 from cartridges.importer.desktop_source import DesktopSource
 from cartridges.importer.flatpak_source import FlatpakSource
@@ -68,6 +69,7 @@ class CartridgesApplication(Adw.Application):
     state = shared.AppState.DEFAULT
     win: CartridgesWindow
     init_search_term: Optional[str] = None
+    gamepad: Optional[GamepadController] = None
 
     def __init__(self) -> None:
         shared.store = Store()
@@ -145,6 +147,7 @@ class CartridgesApplication(Adw.Application):
                 ("preferences", ("<primary>comma",)),
                 ("launch_game",),
                 ("hide_game",),
+                ("show_game_details",),
                 ("edit_game",),
                 ("add_game", ("<primary>n",)),
                 ("import", ("<primary>i",)),
@@ -182,6 +185,10 @@ class CartridgesApplication(Adw.Application):
             shared.win.search_entry.set_position(-1)
 
         shared.win.present()
+
+        if self.gamepad is None:
+            self.gamepad = GamepadController(self)
+            self.gamepad.start()
 
         if shared.schema.get_boolean("auto-import"):
             self.on_import_action()
@@ -328,6 +335,9 @@ class CartridgesApplication(Adw.Application):
 
     def on_hide_game_action(self, *_args: Any) -> None:
         shared.win.active_game.toggle_hidden()
+
+    def on_show_game_details_action(self, *_args: Any) -> None:
+        shared.win.show_details_page(shared.win.active_game)
 
     def on_edit_game_action(self, *_args: Any) -> None:
         DetailsDialog(shared.win.active_game).present(shared.win)

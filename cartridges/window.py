@@ -392,28 +392,126 @@ class CartridgesWindow(Adw.ApplicationWindow):
         keyval: int,
         _keycode: int,
         state: Gdk.ModifierType,
-        view: Gtk.GridView,
-        model: Gio.ListModel,
+        _view: Gtk.GridView,
+        _model: Gio.ListModel,
     ) -> bool:
         if keyval not in self.ARROW_KEYS or state & Gtk.accelerator_get_default_mod_mask():
             return False
+        return self.move_library_focus(*self.ARROW_KEYS[keyval])
 
+    def get_focused_card(self) -> Optional[GameWidget]:
+        """The library card that has the keyboard focus, if any"""
         card = self.get_focus()
         while card and not isinstance(card, GameWidget):
             card = card.get_parent()
-        if not card or not card.list_item:
-            return False
+        return card if card and card.list_item else None
 
-        step, rows = self.ARROW_KEYS[keyval]
+    def move_library_focus(self, step: int, rows: int) -> bool:
+        """Move the focus between cards: `step` columns right, `rows` rows down
+
+        Returns False when there is nothing to move to (the edge of the
+        grid), so that the focus can leave the grid.
+        """
+        if not (card := self.get_focused_card()):
+            return False
+        view = card.get_ancestor(Gtk.GridView)
+        model = view.get_model().get_model()
+
         if self.get_direction() == Gtk.TextDirection.RTL:
             step = -step
-        position = card.list_item.get_position() + step + rows * view.get_max_columns()
-        if not 0 <= position < model.get_n_items():
+        columns, total = view.get_max_columns(), model.get_n_items()
+        current = card.list_item.get_position()
+        position = current + step + rows * columns
+        if rows > 0 and total <= position and current // columns < (total - 1) // columns:
+            position = total - 1  # Down from a row that is longer than the last
+        if not 0 <= position < total:
             return False  # Let focus leave the grid at its edges
 
+        self.focus_library_position(view, model, position)
+        return True
+
+    def focus_library_position(
+        self, view: Gtk.GridView, model: Gio.ListModel, position: int
+    ) -> None:
+        """Scroll to a game and give its card the focus
+
+        The card of a game that was scrolled out of view does not exist yet,
+        so the focus is moved as soon as the GridView has created it.
+        """
         view.scroll_to(position, Gtk.ListScrollFlags.NONE, None)
-        if (widget := model.get_item(position).widget) is not None:
-            widget.cover_button.grab_focus()
+        tries = 20
+
+        def focus() -> bool:
+            nonlocal tries
+            game = model.get_item(position)
+            if game is None:
+                return False
+            if (widget := game.widget) is not None and widget.get_mapped():
+                widget.cover_button.grab_focus()
+                return False
+            tries -= 1
+            return tries > 0
+
+        if focus():
+            GLib.timeout_add(16, focus)
+
+    def get_visible_library(self) -> Optional[tuple[Gtk.GridView, Gio.ListModel]]:
+        """The grid and model of the library page on screen, if there is one"""
+        page = self.navigation_view.get_visible_page()
+        if page == self.library_page:
+            return self.library, self.library_model
+        if page == self.hidden_library_page:
+            return self.hidden_library, self.hidden_library_model
+        return None
+
+    def focus_library(self) -> bool:
+        """Focus the first game of the library on screen"""
+        if not (library := self.get_visible_library()):
+            return False
+        view, model = library
+        if not model.get_n_items():
+            return False
+        self.focus_library_position(view, model, 0)
+        return True
+
+    def focus_sidebar(self) -> bool:
+        """Focus the selected source of the sidebar, if it is shown"""
+        if not self.overlay_split_view.get_show_sidebar():
+            return False
+        row = self.sidebar.get_selected_row()
+        return row is not None and row.grab_focus()
+
+    def is_at_first_column(self) -> bool:
+        """Whether the focused card is in the column next to the sidebar"""
+        if not (card := self.get_focused_card()):
+            return False
+        view = card.get_ancestor(Gtk.GridView)
+        return card.list_item.get_position() % view.get_max_columns() == 0
+
+    def is_in_sidebar(self) -> bool:
+        focus = self.get_focus()
+        return focus is not None and focus.get_ancestor(Gtk.ListBox) == self.sidebar
+
+    def select_adjacent_source(self, offset: int) -> bool:
+        """Select the previous (-1) or next (1) row of the sidebar"""
+        if self.navigation_view.get_visible_page() != self.library_page:
+            return False
+
+        rows = []
+        index = 0
+        while row := self.sidebar.get_row_at_index(index):
+            if row.get_visible() and row.get_selectable():
+                rows.append(row)
+            index += 1
+
+        current = self.sidebar.get_selected_row()
+        if current not in rows:
+            return False
+        target = rows.index(current) + offset
+        if not 0 <= target < len(rows):
+            return False
+
+        self.sidebar.select_row(rows[target])
         return True
 
     def queue_game_update(self, game: Game) -> None:

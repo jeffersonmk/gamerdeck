@@ -53,6 +53,25 @@ Cartridges is an easy-to-use, elegant game launcher written in Python using GTK4
 - Searching for games on various databases
 - Animated covers
 - A search provider for GNOME
+- Navigating with an Xbox or PlayStation controller
+
+## Controller support
+
+Xbox and PlayStation controllers (wired or Bluetooth) can navigate the whole app through [libmanette](https://gnome.pages.gitlab.gnome.org/libmanette/). The buttons are named by position, so the same layout works on both:
+
+| Xbox | PlayStation | Action |
+|---|---|---|
+| D-pad or left stick | D-pad or left stick | Move the focus (hold to repeat) |
+| A | ✕ | Launch the game, or press the focused button |
+| B | ○ | Close the menu or dialog, leave the search, go back |
+| X | □ | Open the menu of the focused game (Details, Edit, Hide, Remove) |
+| Y | △ | Search |
+| LB / RB | L1 / R1 | Previous / next source in the sidebar |
+| Menu | Options | Show or hide the sidebar |
+
+The controller only works while the app window has the focus, so it never reacts while you are playing. If libmanette is not installed, the app works as before. The Flatpak needs `--device=input` to see controllers.
+
+To try it without a controller, `tests/gamepad_uinput.py` creates virtual Xbox and DualSense controllers (see the file for how to run it).
 
 For updates and questions, join our [Discord server][discord-url]!
 
