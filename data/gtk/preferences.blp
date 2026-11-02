@@ -16,6 +16,11 @@ template $CartridgesPreferences: Adw.PreferencesDialog {
         title: _("Exit After Launching Games");
       }
 
+      Adw.SwitchRow show_continue_playing_switch {
+        title: _("Continue Playing");
+        subtitle: _("Show the recently played games row in the library");
+      }
+
       Adw.SwitchRow cover_launches_game_switch {
         title: _("Cover Image Launches Game");
         subtitle: _("Swaps the behavior of the cover image and the play button");

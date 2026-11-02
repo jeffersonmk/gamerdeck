@@ -23,6 +23,7 @@ from weakref import WeakSet
 from gi.repository import Gio, Gtk
 
 from cartridges import shared
+from cartridges.emulators import console_icon, get_emulator
 from cartridges.game import Game
 from cartridges.game_cover import GameCover
 from cartridges.platforms import platform_of
@@ -177,8 +178,26 @@ class GameWidget(Gtk.Box):
             open_page(self.game.protondb)
 
     def update_platform(self) -> None:
-        """Show where the game came from, if it has an app to open"""
-        platform = platform_of(self.game) if self.game else None
+        """Show the game platform or its emulator's console on the card"""
+        game = self.game
+        emulator = get_emulator(game.emulator) if game else None
+        if game and emulator:
+            self.platform_button.set_visible(True)
+            if icon_file := console_icon(game.console):
+                image = Gtk.Image.new_from_resource(
+                    f"{shared.PREFIX}/icons/consoles/{icon_file}"
+                )
+                image.set_pixel_size(16)
+            else:
+                image = Gtk.Image.new_from_icon_name("applications-games-symbolic")
+            self.platform_button.set_child(image)
+            self.platform_button.set_tooltip_text(
+                # The variable is an emulator application name, like PCSX2
+                _("Open {}").format(emulator.name)
+            )
+            return
+
+        platform = platform_of(game) if game else None
         client = platform.client if platform else None
         self.platform_button.set_visible(client is not None)
         if platform and client:

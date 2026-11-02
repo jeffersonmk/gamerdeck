@@ -98,6 +98,15 @@ NEW_LIST="$(mktemp "${TMPDIR:-/tmp}/gamerdeck-list.XXXXXX")"
 trap 'rm -f "$LOG" "$NEW_LIST"' EXIT
 grep '^/' "$BUILD/meson-logs/install-log.txt" > "$NEW_LIST" || die "Meson did not list what it installed."
 
+# Meson writes into the commands the Python it runs with, which is not always the
+# one of the system (Meson installed with pip or pipx has its own). The app has to
+# run with the Python that was checked at the start, so put that one in.
+PYTHON="$(command -v python3)"
+for script in "$PREFIX/bin/cartridges" "$PREFIX/libexec/cartridges-search-provider"; do
+    [ -f "$script" ] || die "Meson did not install $script"
+    sed -i "1s|^#!.*|#!$PYTHON|" "$script"
+done
+
 # A command with the name of the app, for the terminal
 ln -sf cartridges "$PREFIX/bin/gamerdeck"
 echo "$PREFIX/bin/gamerdeck" >> "$NEW_LIST"

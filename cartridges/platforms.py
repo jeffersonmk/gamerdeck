@@ -28,10 +28,12 @@ import logging
 import os
 import shutil
 from dataclasses import dataclass
+from pathlib import Path
 from shlex import quote
 from typing import Optional
 
 from cartridges import shared
+from cartridges.emulators import get_emulator
 from cartridges.game import Game
 from cartridges.utils.run_executable import run_executable
 
@@ -93,6 +95,8 @@ def platform_of(game: Game) -> Optional[Platform]:
 
 def client_of(game: Game) -> Optional[Client]:
     """The app to open for a game, if there is one"""
+    if emulator := get_emulator(game.emulator):
+        return Client(emulator.name, emulator.command, emulator.flatpak_id)
     platform = platform_of(game)
     return platform.client if platform else None
 
@@ -103,6 +107,17 @@ def _sandboxed() -> bool:
 
 def client_command(game: Game) -> Optional[str]:
     """The command that opens the client of a game (the game page for Steam)"""
+    if emulator := get_emulator(game.emulator):
+        flatpak_paths = (
+            shared.flatpak_dir / emulator.flatpak_id,
+            Path("/var/lib/flatpak/app") / emulator.flatpak_id,
+        ) if emulator.flatpak_id else ()
+        flatpak_installed = any(path.exists() for path in flatpak_paths)
+        native_installed = not _sandboxed() and shutil.which(emulator.command) is not None
+        if flatpak_installed and not native_installed and emulator.flatpak_id:
+            return f"flatpak run {emulator.flatpak_id}"
+        return emulator.command
+
     if (client := client_of(game)) is None:
         return None
 

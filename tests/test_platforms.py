@@ -60,6 +60,31 @@ class PlatformOfTests(unittest.TestCase):
         self.assertIsNone(platforms.client_command(game))
         self.assertFalse(platforms.open_client(game))
 
+    def test_desktop_emulator_opens_its_emulator_app(self):
+        game = make_game("desktop", name="Gran Turismo 4")
+        game.emulator = "pcsx2"
+        game.console = "ps2"
+        client = platforms.client_of(game)
+        if client is None:
+            self.fail("PCSX2 must be recognized as the desktop game's client")
+        self.assertEqual(client.name, "PCSX2")
+        with mock.patch("shutil.which", return_value="/usr/bin/pcsx2-qt"):
+            self.assertEqual(platforms.client_command(game), "pcsx2-qt")
+
+    def test_unrecognized_emulator_has_no_client(self):
+        game = make_game("desktop")
+        game.emulator = "some-emulator"
+        self.assertIsNone(platforms.client_of(game))
+        self.assertIsNone(platforms.client_command(game))
+
+    def test_every_console_icon_is_in_the_resources(self):
+        from cartridges.emulators import CONSOLE_ICONS
+
+        for icon in set(CONSOLE_ICONS.values()):
+            Gio.resources_get_info(
+                f"{shared.PREFIX}/icons/consoles/{icon}", 0
+            )
+
     def test_every_icon_is_in_the_resources(self):
         for platform in platforms.PLATFORMS.values():
             path = f"{shared.PREFIX}/icons/scalable/categories/{platform.icon}.svg"
@@ -82,6 +107,15 @@ class ClientCommandTests(unittest.TestCase):
         path = shared.flatpak_dir / flatpak_id
         path.mkdir(parents=True, exist_ok=True)
         self.flatpak_dirs.append(path)
+
+    def test_emulator_flatpak_is_used_when_it_is_installed(self):
+        self.install_flatpak("net.pcsx2.PCSX2")
+        game = make_game("desktop")
+        game.emulator = "pcsx2"
+        with mock.patch("shutil.which", return_value=None):
+            self.assertEqual(
+                platforms.client_command(game), "flatpak run net.pcsx2.PCSX2"
+            )
 
     def test_steam_opens_the_page_of_the_game(self):
         game = make_game("steam", game_id="steam_1364780")

@@ -79,7 +79,7 @@ The platform comes from the source of the game: Steam, Lutris, Faugus, Bottles, 
 
 ### Banner and button legend
 
-The top of the library shows a banner with the game that has the focus (or the pointer): its cover, developer, last played date, the platform it came from (click to open the app), its ProtonDB rating, and **Play** and **Details** buttons. Below it, **Continue Playing** lists the games played last. The banner follows the system accent color, in light and dark mode, and gives way to the search results while you search. Windows shorter than 860 px hide the recent games row, and narrow ones (below 565 px) use a compact banner.
+The top of the library shows a banner with the game that has the focus (or the pointer): its cover, developer, last played date, the platform it came from (click to open the app), its ProtonDB rating, and **Play** and **Details** buttons. Below it, **Continue Playing** lists the games played last; a preference lets you hide or show this row. The banner follows the system accent color, in light and dark mode, and gives way to the search results while you search. Windows shorter than 860 px hide the recent games row, and narrow ones (below 565 px) use a compact banner.
 
 At the bottom of the window, a legend shows what each controller button does right now (library, sidebar, card menu, dialog, search, details page), drawn with the symbols of the controller you are using: A B X Y for Xbox, ✕ ○ □ △ for PlayStation. In the preferences, **Controller** lets you show it only while you use a controller (the default: it appears with the next button press and goes away when you go back to the mouse or the keyboard), always, or never, and choose the Xbox or PlayStation symbols instead of following the controller in use.
 

@@ -58,6 +58,7 @@ class CartridgesPreferences(Adw.PreferencesDialog):
     sources_group: Adw.PreferencesGroup = Gtk.Template.Child()
 
     exit_after_launch_switch: Adw.SwitchRow = Gtk.Template.Child()
+    show_continue_playing_switch: Adw.SwitchRow = Gtk.Template.Child()
     cover_launches_game_switch: Adw.SwitchRow = Gtk.Template.Child()
     protondb_switch: Adw.SwitchRow = Gtk.Template.Child()
     hints_mode_row: Adw.ComboRow = Gtk.Template.Child()
@@ -245,6 +246,7 @@ class CartridgesPreferences(Adw.PreferencesDialog):
         self.bind_switches(
             {
                 "exit-after-launch",
+                "show-continue-playing",
                 "cover-launches-game",
                 "high-quality-images",
                 "protondb",

@@ -10,6 +10,7 @@ from tests.support import TMP
 from gi.repository import GLib, Gtk  # noqa: E402
 
 from cartridges import shared  # noqa: E402
+from cartridges.emulators import detect_emulator  # noqa: E402
 from cartridges.game import Game  # noqa: E402
 from cartridges.importer import not_games  # noqa: E402
 from cartridges.importer.desktop_source import (  # noqa: E402
@@ -133,6 +134,28 @@ class DesktopEntryTests(unittest.TestCase):
         )
 
 
+class EmulatorDetectionTests(unittest.TestCase):
+    def test_detects_common_emulators_and_console(self):
+        cases = {
+            'mangohud pcsx2-qt -fullscreen "/games/GT4.iso"': ("pcsx2", "ps2"),
+            "dolphin-emu --exec=game.iso": ("dolphin", "gamecube"),
+            "rpcs3 /games/title.elf": ("rpcs3", "ps3"),
+            "flatpak run org.ppsspp.PPSSPP game.iso": ("ppsspp", "psp"),
+            "cemu game.wud": ("cemu", "wiiu"),
+            "env MANGOHUD=1 gamemoderun yuzu game.nsp": ("yuzu", "switch"),
+        }
+        for command, expected in cases.items():
+            with self.subTest(command=command):
+                emulator = detect_emulator(command)
+                if emulator is None:
+                    self.fail(f"No emulator recognized for {command}")
+                self.assertEqual((emulator.id, emulator.console), expected)
+
+    def test_ignores_unknown_command_and_malformed_exec(self):
+        self.assertIsNone(detect_emulator("game-launcher /roms/game.iso pcsx2"))
+        self.assertIsNone(detect_emulator('"unterminated'))
+
+
 APPLICATIONS = {
     "steam.desktop": ("Steam", "/usr/bin/steam %U", "Network;FileTransfer;Game;"),
     "heroic.desktop": ("Heroic Games Launcher", "heroic %U", "Game;"),
@@ -175,6 +198,9 @@ class DesktopSourceTests(unittest.TestCase):
         self.assertEqual(
             sorted(game.name for game in games), ["Gran Turismo 4", "SuperTuxKart"]
         )
+        gt4 = next(game for game in games if game.name == "Gran Turismo 4")
+        self.assertEqual(gt4.emulator, "pcsx2")
+        self.assertEqual(gt4.console, "ps2")
 
 
 def make_game(name: str, source: str = "steam", game_id: str = "") -> Game:

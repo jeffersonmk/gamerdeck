@@ -66,6 +66,8 @@ def make_library() -> None:
                     "hidden": False,
                     "last_played": 1_700_000_000 + i,
                     "name": f"Game {i:02d}",
+                    "emulator": "pcsx2" if i == N_GAMES - 1 else None,
+                    "console": "ps2" if i == N_GAMES - 1 else None,
                     "developer": "Test",
                     "removed": False,
                     "blacklisted": False,
@@ -145,6 +147,7 @@ def glyph_offsets(win, path: Path) -> list:
 
 def steps(app):
     win = shared.win
+    assert win is not None
     ctl = app.gamepad
     # Broadway never reports the window as active
     ctl.get_window = lambda: win
@@ -223,6 +226,14 @@ def steps(app):
     yield 400  # layout
     check("grid has several columns", cols() > 1)
     check("sidebar is shown", win.overlay_split_view.get_show_sidebar())
+    assert shared.store is not None
+    emulator_game = getattr(shared.store, "source_games")["steam"]["steam_23"]
+    check(
+        "emulator card shows the console image and emulator tooltip",
+        emulator_game.widget is not None
+        and emulator_game.widget.platform_button.get_visible()
+        and emulator_game.widget.platform_button.get_tooltip_text() == "Open PCSX2",
+    )
     shot("1-start")
 
     # The banner, the row of recent games and the legend
@@ -243,6 +254,13 @@ def steps(app):
     check("the row lists the latest games, newest first",
           [win.rail.store.get_item(i).name for i in range(3)]
           == [f"Game {N_GAMES - 1 - i:02d}" for i in range(3)])
+    check("Continue Playing is shown by default", win.rail_revealer.get_reveal_child())
+    shared.schema.set_boolean("show-continue-playing", False)
+    yield 350
+    check("the preference hides Continue Playing", not win.rail_revealer.get_child_revealed())
+    shared.schema.set_boolean("show-continue-playing", True)
+    yield 350
+    check("the preference restores Continue Playing", win.rail_revealer.get_child_revealed())
     # "auto": the legend shows only while a controller is connected AND in use.
     # Real controllers of the machine that runs the test count, so use a fake one
     # and judge by what the user did last.

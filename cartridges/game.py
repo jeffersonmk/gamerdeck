@@ -50,6 +50,8 @@ class Game(GObject.Object):
     executable: str
     game_id: str
     source: str
+    emulator: Optional[str] = None
+    console: Optional[str] = None
     hidden: bool = False
     last_played: int = 0
     name: str

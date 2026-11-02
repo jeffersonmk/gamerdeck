@@ -26,4 +26,18 @@
   <file alias="retroarch-source-symbolic.svg">icons/sources/retroarch-source-symbolic.svg</file>
   <file alias="steam-source-symbolic.svg">icons/sources/steam-source-symbolic.svg</file>
   </gresource>
+  <gresource prefix="@PREFIX@/icons/consoles/">
+    <file alias="ps2.svg">icons/consoles/ps2.svg</file>
+    <file alias="gamecube.png">icons/consoles/gamecube.png</file>
+    <file alias="playstation.png">icons/consoles/playstation.png</file>
+    <file alias="psp.png">icons/consoles/psp.png</file>
+    <file alias="dreamcast.png">icons/consoles/dreamcast.png</file>
+    <file alias="n64.png">icons/consoles/n64.png</file>
+    <file alias="nds.png">icons/consoles/nds.png</file>
+    <file alias="gba.png">icons/consoles/gba.png</file>
+    <file alias="gbc.png">icons/consoles/gbc.png</file>
+    <file alias="snes.png">icons/consoles/snes.png</file>
+    <file alias="nes.png">icons/consoles/nes.png</file>
+    <file alias="megadrive.png">icons/consoles/megadrive.png</file>
+  </gresource>
 </gresources>

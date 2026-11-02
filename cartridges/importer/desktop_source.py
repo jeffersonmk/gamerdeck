@@ -26,6 +26,7 @@ from typing import NamedTuple
 from gi.repository import GLib, Gtk
 
 from cartridges import shared
+from cartridges.emulators import detect_emulator
 from cartridges.game import Game
 from cartridges.importer.not_games import is_not_a_game_desktop_entry
 from cartridges.importer.source import Source, SourceIterable
@@ -90,9 +91,8 @@ class DesktopSourceIterable(SourceIterable):
                         continue
 
                     name = keyfile.get_string("Desktop Entry", "Name")
-                    executable = keyfile.get_string("Desktop Entry", "Exec").split(
-                        " %"
-                    )[0]
+                    desktop_exec = keyfile.get_string("Desktop Entry", "Exec")
+                    executable = desktop_exec.split(" %")[0]
                 except GLib.Error:
                     continue
 
@@ -138,6 +138,7 @@ class DesktopSourceIterable(SourceIterable):
 
                 launch_arg = shlex.quote(str(entry if full_path else entry.stem))
 
+                emulator = detect_emulator(desktop_exec)
                 values = {
                     "source": self.source.source_id,
                     "added": shared.import_time,
@@ -145,6 +146,9 @@ class DesktopSourceIterable(SourceIterable):
                     "game_id": f"desktop_{entry.stem}",
                     "executable": f"{launch_command} {launch_arg}",
                 }
+                if emulator:
+                    values["emulator"] = emulator.id
+                    values["console"] = emulator.console
                 game = Game(values)
 
                 additional_data = {}

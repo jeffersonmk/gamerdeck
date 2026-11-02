@@ -27,6 +27,7 @@ install_data(
     'rail.py',
     'gamepad.py',
     'platforms.py',
+    'emulators.py',
     configure_file(input: 'shared.py.in', output: 'shared.py', configuration: conf),
   ],
   install_dir: moduledir,

@@ -39,6 +39,8 @@ class FileManager(AsyncManager):
             "executable",
             "game_id",
             "source",
+            "emulator",
+            "console",
             "hidden",
             "last_played",
             "name",

@@ -354,6 +354,9 @@ class CartridgesWindow(Adw.ApplicationWindow):
                 "changed", self.update_columns, view
             )
         shared.schema.connect("changed::library-rows", self.on_library_rows_changed)
+        shared.schema.connect(
+            "changed::show-continue-playing", self.on_continue_playing_changed
+        )
 
     CARD_WIDTH = 200 + 12  # Card plus spacing, see style.css
     GRID_PADDING = 2 * 9
@@ -381,6 +384,9 @@ class CartridgesWindow(Adw.ApplicationWindow):
                     for name, pad in self._grid_padding.items()
                 )
             )
+
+    def on_continue_playing_changed(self, *_args: Any) -> None:
+        self.refresh_library_header()
 
     def on_library_rows_changed(self, *_args: Any) -> None:
         for scrolled_window, view in (
@@ -573,7 +579,8 @@ class CartridgesWindow(Adw.ApplicationWindow):
 
         recent = recent_games(games)
         self.rail.set_games(recent)
-        self.rail_revealer.set_reveal_child(bool(recent))
+        show_continue_playing = shared.schema.get_boolean("show-continue-playing")
+        self.rail_revealer.set_reveal_child(show_continue_playing and bool(recent))
         self.library_section_label.set_label(self.library_page.get_title())
 
         target = self._hero_target
