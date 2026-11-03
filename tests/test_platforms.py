@@ -243,5 +243,21 @@ class GameWidgetBadgeTests(unittest.TestCase):
         self.assertIs(self.card.menu_button.get_menu_model(), first)
 
 
+class ConsoleIconTests(unittest.TestCase):
+    def test_every_console_of_an_emulator_has_a_bundled_icon(self):
+        from pathlib import Path
+
+        from cartridges import emulators
+
+        icons = Path(__file__).resolve().parent.parent / "data" / "icons" / "consoles"
+        consoles = {e.console for e in emulators._EMULATORS.values()}  # pylint: disable=protected-access
+        for console in consoles:
+            self.assertIn(console, emulators.CONSOLE_ICONS, console)
+        for console, icon_file in emulators.CONSOLE_ICONS.items():
+            self.assertTrue((icons / icon_file).is_file(), console)
+        bundled = {p.name for p in icons.iterdir() if p.suffix in (".png", ".svg")}
+        self.assertEqual(bundled, set(emulators.CONSOLE_ICONS.values()))
+
+
 if __name__ == "__main__":
     unittest.main()

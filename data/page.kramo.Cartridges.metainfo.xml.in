@@ -49,6 +49,14 @@
   </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="1.1.2" date="2026-11-02">
+      <description translate="no">
+        <ul>
+          <li>New single-color console icons on the cover of emulator games: brand logos for PlayStation, Sega and Xbox, console drawings for Nintendo</li>
+          <li>Icons for Wii U, Switch, Xbox and 3DS, which had none</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.1" date="2026-11-02">
       <description translate="no">
         <ul>

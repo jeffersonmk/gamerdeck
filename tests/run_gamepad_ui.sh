@@ -24,7 +24,7 @@ if command -v kwin_wayland >/dev/null 2>&1 && command -v dbus-run-session >/dev/
             sleep 0.5
         done
         env -u DISPLAY GDK_BACKEND=wayland WAYLAND_DISPLAY=gamepad-ui GTK_A11Y=none \
-            PATH=/usr/local/bin:/usr/bin:/bin /usr/bin/python3 -m tests.gamepad_ui
+            PATH=/usr/local/bin:/usr/bin:/bin /usr/bin/python3 -m ${GAMERDECK_UI_MODULE:-tests.gamepad_ui}
         STATUS=$?
         kill "$KWIN"
         exit "$STATUS"
@@ -49,7 +49,7 @@ if [ -n "$GAMERDECK_BROWSER" ]; then
 fi
 env -u WAYLAND_DISPLAY -u DISPLAY GDK_BACKEND=broadway BROADWAY_DISPLAY=":$N" \
     GTK_A11Y=none PATH=/usr/local/bin:/usr/bin:/bin \
-    /usr/bin/python3 -m tests.gamepad_ui
+    /usr/bin/python3 -m ${GAMERDECK_UI_MODULE:-tests.gamepad_ui}
 STATUS=$?
 [ -n "$BROWSER_PID" ] && kill "$BROWSER_PID"
 kill "$BROADWAY"

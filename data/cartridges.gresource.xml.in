@@ -27,17 +27,18 @@
   <file alias="steam-source-symbolic.svg">icons/sources/steam-source-symbolic.svg</file>
   </gresource>
   <gresource prefix="@PREFIX@/icons/consoles/">
-    <file alias="ps2.svg">icons/consoles/ps2.svg</file>
+    <file alias="3ds.png">icons/consoles/3ds.png</file>
     <file alias="gamecube.png">icons/consoles/gamecube.png</file>
-    <file alias="playstation.png">icons/consoles/playstation.png</file>
-    <file alias="psp.png">icons/consoles/psp.png</file>
-    <file alias="dreamcast.png">icons/consoles/dreamcast.png</file>
-    <file alias="n64.png">icons/consoles/n64.png</file>
-    <file alias="nds.png">icons/consoles/nds.png</file>
     <file alias="gba.png">icons/consoles/gba.png</file>
     <file alias="gbc.png">icons/consoles/gbc.png</file>
-    <file alias="snes.png">icons/consoles/snes.png</file>
+    <file alias="n64.png">icons/consoles/n64.png</file>
+    <file alias="nds.png">icons/consoles/nds.png</file>
     <file alias="nes.png">icons/consoles/nes.png</file>
-    <file alias="megadrive.png">icons/consoles/megadrive.png</file>
+    <file alias="playstation.svg">icons/consoles/playstation.svg</file>
+    <file alias="sega.svg">icons/consoles/sega.svg</file>
+    <file alias="snes.png">icons/consoles/snes.png</file>
+    <file alias="switch.png">icons/consoles/switch.png</file>
+    <file alias="wiiu.png">icons/consoles/wiiu.png</file>
+    <file alias="xbox.svg">icons/consoles/xbox.svg</file>
   </gresource>
 </gresources>

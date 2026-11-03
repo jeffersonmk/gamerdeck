@@ -49,20 +49,23 @@ _FLATPAK_IDS = {emulator.flatpak_id: emulator.id for emulator in _EMULATORS.valu
 _WRAPPERS = {"mangohud", "gamemoderun", "prime-run", "gamescope"}
 
 CONSOLE_ICONS = {
-    "ps1": "playstation.png",
-    "ps2": "ps2.svg",
-    "ps3": "playstation.png",
+    "ps1": "playstation.svg",
+    "ps2": "playstation.svg",
+    "ps3": "playstation.svg",
+    "psp": "playstation.svg",
+    "xbox": "xbox.svg",
+    "dreamcast": "sega.svg",
+    "megadrive": "sega.svg",
     "gamecube": "gamecube.png",
-    "psp": "psp.png",
-    "dreamcast": "dreamcast.png",
+    "wiiu": "wiiu.png",
+    "switch": "switch.png",
     "n64": "n64.png",
     "nds": "nds.png",
-    "3ds": "nds.png",
+    "3ds": "3ds.png",
     "gba": "gba.png",
     "gbc": "gbc.png",
     "snes": "snes.png",
     "nes": "nes.png",
-    "megadrive": "megadrive.png",
 }
 
 

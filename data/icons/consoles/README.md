@@ -1,13 +1,24 @@
-Console miniícones bundled with Gamerdeck
-========================================
+Console icons bundled with Gamerdeck
+====================================
 
-The PNG console artwork in this directory is from KyleBing's `retro-game-console-icons` collection, specifically `series_trimui/300w@1x`:
-https://github.com/KyleBing/retro-game-console-icons
+White, single-color icons used as small console identifiers in the game-card badges.
+The artwork belongs to its authors; the brand logos are trademarks of their owners and
+are used only to say which console an emulator runs.
 
-Copyright/attribution: KyleBing, “retro-game-console-icons”. Licensed under the Creative Commons Attribution 4.0 International license (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/ . The upstream project asks users to credit the library. The unmodified upstream LICENSE is included as `LICENSE-CC-BY-4.0`.
+Brand logos (`playstation.svg`, `sega.svg`)
+: From Simple Icons, https://simpleicons.org, released under CC0 1.0
+  (https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md). Filled in white.
+  `playstation.svg` is used for every PlayStation console (the specific logos of the PS2, PS3 and PSP are
+  too thin to read at this size) and `sega.svg` for both Dreamcast and Mega Drive.
 
-The PlayStation 2 SVG is `PlayStation 2 logo.svg` by Ssolbergj, obtained from Wikimedia Commons:
-https://commons.wikimedia.org/wiki/File:PlayStation_2_logo.svg
-Wikimedia Commons identifies it as public domain. The badge version changes the logo fills to white for visibility on dark covers.
+Xbox logo (`xbox.svg`)
+: From Font Awesome Free 6, https://fontawesome.com, Copyright 2024 Fonticons, Inc.,
+  licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Filled in white.
 
-These assets are used only as small console identifiers in game-card badges; the icon artwork remains credited to its original authors.
+Console drawings (`gamecube.png`, `wiiu.png`, `switch.png`, `n64.png`, `nds.png`, `3ds.png`,
+`gba.png`, `gbc.png`, `snes.png`, `nes.png`)
+: From the libretro `retroarch-assets` project, `xmb/monochrome`, https://github.com/libretro/retroarch-assets,
+  licensed under CC BY 4.0. Nintendo does not allow its brand logos in the free icon
+  collections, so these are drawings of the consoles instead. Unmodified.
+
+The text of the CC BY 4.0 license is in `LICENSE-CC-BY-4.0`.
