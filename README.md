@@ -40,6 +40,7 @@ These are the app itself, taken on a demo library of made-up games with covers d
 | More sources | [Faugus Launcher](https://github.com/Faugus/faugus-launcher), and a Lutris importer that no longer duplicates games or loses the hidden state |
 | Platform badge | Each cover shows where the game came from; clicking it opens that app |
 | ProtonDB | The rating of each game on its cover and on its page |
+| Update from the app | Preferences → General → Updates downloads and installs the newest version (installation from source) |
 | Emulator icons | Games started through an emulator show the icon of their console on the cover (PS2, GameCube, PSP, GBA, SNES...) |
 | Vitrine layout | A banner with the game in focus and a "Continue Playing" row, in the colors of the system theme |
 | Controller | The whole app works with an Xbox or PlayStation controller, with a legend of what each button does |
@@ -284,10 +285,18 @@ Your library is the folder Cartridges uses, `~/.local/share/cartridges`, so it i
 
 ### Update
 
-```sh
-git pull
-scripts/install-source.sh
-```
+Two ways, both do the same:
+
+- **In the app:** open **Preferences → General → Updates** and press **Update**. It looks for a new version on GitHub, installs it and tells you to close and open the app again.
+- **In the terminal:**
+
+  ```sh
+  scripts/update.sh
+  ```
+
+  `scripts/update.sh --check` only tells whether there is a new version, without installing.
+
+The script runs `git pull` in the folder you cloned and then `scripts/install-source.sh`, so the folder must stay where it is (the app remembers it). If you changed files of that folder by hand and they conflict, the update stops with a message and changes nothing.
 
 The library and the settings stay. Files that the old version had and the new one does not are removed. After an update of Python to a new version (for example 3.14 to 3.15), run the script again, because the Python files go to a folder named after the version.
 

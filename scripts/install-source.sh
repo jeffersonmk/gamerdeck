@@ -37,10 +37,15 @@ MANIFEST="$PREFIX/share/gamerdeck/install-manifest.txt"
 # ---------------------------------------------------------------- requirements
 say "Checking what the build needs"
 
+# The Python the app will run with: the one of the system, not one of a virtual
+# environment that happens to be first in the PATH
+PYTHON="$(command -v /usr/bin/python3 || command -v python3 || true)"
+
 missing=()
-for tool in meson ninja python3; do
+for tool in meson ninja; do
     command -v "$tool" >/dev/null || missing+=("$tool")
 done
+[ -n "$PYTHON" ] || missing+=(python3)
 if [ ${#missing[@]} -gt 0 ]; then
     die "Missing: ${missing[*]}. On Arch Linux: sudo pacman -S meson blueprint-compiler gettext desktop-file-utils. The README lists the other requirements."
 fi
@@ -50,7 +55,7 @@ if ! command -v blueprint-compiler >/dev/null && [ ! -d "$ROOT/subprojects/bluep
     die "blueprint-compiler is missing. Install it (Arch Linux: sudo pacman -S blueprint-compiler) or install git, so Meson can download it."
 fi
 
-python3 - <<'PY' || die "The Python of this system cannot run Gamerdeck (see above). The README lists the requirements."
+"$PYTHON" - <<'PY' || die "The Python of this system cannot run Gamerdeck (see above). The README lists the requirements."
 import sys
 
 try:
@@ -101,7 +106,6 @@ grep '^/' "$BUILD/meson-logs/install-log.txt" > "$NEW_LIST" || die "Meson did no
 # Meson writes into the commands the Python it runs with, which is not always the
 # one of the system (Meson installed with pip or pipx has its own). The app has to
 # run with the Python that was checked at the start, so put that one in.
-PYTHON="$(command -v python3)"
 for script in "$PREFIX/bin/cartridges" "$PREFIX/libexec/cartridges-search-provider"; do
     [ -f "$script" ] || die "Meson did not install $script"
     sed -i "1s|^#!.*|#!$PYTHON|" "$script"
@@ -126,7 +130,10 @@ if [ -f "$MANIFEST" ]; then
     done < <(comm -23 <(sort -u "$MANIFEST") <(sort -u "$NEW_LIST"))
 fi
 
+# Where the code is, so the app can update itself (Preferences > Updates)
 mkdir -p "$(dirname "$MANIFEST")"
+printf '%s\n' "$ROOT" > "$PREFIX/share/gamerdeck/source-dir"
+echo "$PREFIX/share/gamerdeck/source-dir" >> "$NEW_LIST"
 cp "$NEW_LIST" "$MANIFEST"
 echo "$MANIFEST" >> "$MANIFEST"
 
@@ -147,4 +154,4 @@ if [ -d "$HOME/.local/share/flatpak" ] && command -v flatpak >/dev/null && flatp
 fi
 echo
 echo "Your library is the same folder Cartridges uses, ${XDG_DATA_HOME:-$HOME/.local/share}/cartridges. The settings start empty."
-echo "To update: git pull, then run this script again. To remove: scripts/uninstall-source.sh"
+echo "To update: scripts/update.sh (or Preferences > Updates in the app). To remove: scripts/uninstall-source.sh"

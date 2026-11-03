@@ -49,6 +49,15 @@
   </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="1.1.1" date="2026-11-02">
+      <description translate="no">
+        <ul>
+          <li>Update Gamerdeck from the app (Preferences, General, Updates) or with scripts/update.sh</li>
+          <li>Fixed the preferences not opening after an update of the source installation</li>
+          <li>Games imported before emulators were recognized get their console icon on the next import</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.0" date="2026-11-02">
       <description translate="no">
         <ul>

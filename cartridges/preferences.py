@@ -24,6 +24,7 @@ import re
 from pathlib import Path
 from shutil import rmtree
 from sys import platform
+from threading import Thread
 from typing import Any, Callable, Optional
 
 from gi.repository import Adw, Gio, GLib, Gtk
@@ -44,6 +45,7 @@ from cartridges.importer.retroarch_source import RetroarchSource
 from cartridges.importer.source import Source
 from cartridges.importer.steam_source import SteamSource
 from cartridges.store.managers.sgdb_manager import SgdbManager
+from cartridges.utils import updater
 from cartridges.utils.create_dialog import create_dialog
 
 
@@ -54,6 +56,11 @@ class CartridgesPreferences(Adw.PreferencesDialog):
     general_page: Adw.PreferencesPage = Gtk.Template.Child()
     import_page: Adw.PreferencesPage = Gtk.Template.Child()
     sgdb_page: Adw.PreferencesPage = Gtk.Template.Child()
+
+    updates_group: Adw.PreferencesGroup = Gtk.Template.Child()
+    update_row: Adw.ActionRow = Gtk.Template.Child()
+    update_button: Gtk.Button = Gtk.Template.Child()
+    update_spinner: Adw.Spinner = Gtk.Template.Child()
 
     sources_group: Adw.PreferencesGroup = Gtk.Template.Child()
 
@@ -157,6 +164,18 @@ class CartridgesPreferences(Adw.PreferencesDialog):
 
         # General
         self.remove_all_games_button_row.connect("activated", self.remove_all_games)
+
+        # Updates (only for an installation made by scripts/install-source.sh)
+        self.update_folder = updater.source_dir()
+        self.updates_group.set_visible(self.update_folder is not None)
+        if self.update_folder:
+            self.update_row.set_subtitle(
+                # The variable is a version number, like 1.1.0
+                _("Installed version {}. Downloads the newest one from GitHub.").format(
+                    updater.source_version(self.update_folder)
+                )
+            )
+            self.update_button.connect("clicked", self.on_update_clicked)
 
         # Debug
         if shared.PROFILE == "development":
@@ -283,6 +302,52 @@ class CartridgesPreferences(Adw.PreferencesDialog):
 
     def set_is_open(self, is_open: bool) -> None:
         self.__class__.is_open = is_open
+
+    def on_update_clicked(self, *_args: Any) -> None:
+        """Check for a newer version and install it, without freezing the window"""
+        folder = self.update_folder
+        if folder is None:
+            return
+        self.update_button.set_sensitive(False)
+        self.update_spinner.set_visible(True)
+        self.add_toast(Adw.Toast.new(_("Looking for a new version…")))
+
+        def work() -> None:
+            status = updater.check(folder)
+            if status.ok and status.code == updater.UPDATE_AVAILABLE:
+                GLib.idle_add(
+                    self.add_toast, Adw.Toast.new(_("Updating… this can take a minute"))
+                )
+                result = updater.update(folder)
+            else:
+                result = status
+            GLib.idle_add(self.on_update_done, result, status.code == updater.UPDATE_AVAILABLE)
+
+        Thread(target=work, daemon=True).start()
+
+    def on_update_done(self, result: updater.UpdateResult, was_available: bool) -> None:
+        self.update_button.set_sensitive(True)
+        self.update_spinner.set_visible(False)
+        if not result.ok:
+            dialog = Adw.AlertDialog.new(
+                _("Could not update"), result.output.strip()[-1200:] or _("Unknown error")
+            )
+            dialog.add_response("close", _("Close"))
+            dialog.present(self)
+            return
+        if not was_available:
+            self.add_toast(Adw.Toast.new(_("Gamerdeck is up to date")))
+            return
+        assert self.update_folder
+        dialog = Adw.AlertDialog.new(
+            _("Updated"),
+            # The variable is a version number, like 1.1.0
+            _("Gamerdeck {} is installed. Close the app and open it again to use it.").format(
+                updater.source_version(self.update_folder)
+            ),
+        )
+        dialog.add_response("close", _("OK"))
+        dialog.present(self)
 
     def get_switch(self, setting: str) -> Any:
         return getattr(self, f'{setting.replace("-", "_")}_switch')

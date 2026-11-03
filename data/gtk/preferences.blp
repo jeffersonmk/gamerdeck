@@ -73,6 +73,31 @@ template $CartridgesPreferences: Adw.PreferencesDialog {
       }
     }
 
+    Adw.PreferencesGroup updates_group {
+      title: _("Updates");
+      visible: false;
+
+      Adw.ActionRow update_row {
+        title: _("Update Gamerdeck");
+        subtitle: _("Download the newest version from GitHub and install it");
+        activatable-widget: update_button;
+
+        [suffix]
+        Adw.Spinner update_spinner {
+          visible: false;
+          valign: center;
+          width-request: 24;
+          height-request: 24;
+        }
+
+        [suffix]
+        Button update_button {
+          label: _("Update");
+          valign: center;
+        }
+      }
+    }
+
     Adw.PreferencesGroup danger_zone_group {
       title: _("Danger Zone");
       separate-rows: true;

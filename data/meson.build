@@ -9,6 +9,9 @@ blueprints = custom_target(
     'gtk/window.blp',
   ),
   output: '.',
+  # The output is a folder, whose date does not change when a file inside it is
+  # rewritten: without this, an edited .blp keeps the old .ui and the app breaks
+  build_always_stale: true,
   command: [
     find_program('blueprint-compiler'),
     'batch-compile',

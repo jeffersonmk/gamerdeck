@@ -112,6 +112,20 @@ class Store:
             except KeyError:
                 pass
 
+    @staticmethod
+    def learn_emulator(stored: Game, scanned: Game) -> None:
+        """Give a game imported before emulators were recognized its emulator"""
+        emulator = getattr(scanned, "emulator", None)
+        console = getattr(scanned, "console", None)
+        if not emulator or (
+            getattr(stored, "emulator", None) == emulator
+            and getattr(stored, "console", None) == console
+        ):
+            return
+        stored.update_values({"emulator": emulator, "console": console})
+        stored.save()
+        stored.update()
+
     def add_game(
         self, game: Game, additional_data: dict, run_pipeline: bool = True
     ) -> Optional[Pipeline]:
@@ -151,6 +165,7 @@ class Store:
             # Duplicate game, ignore it
             logging.debug("Duplicate store game %s (%s)", game.name, game.game_id)
             self.duplicate_game_ids.add(game.game_id)
+            self.learn_emulator(stored_game, game)
             return None
 
         # Connect signals

@@ -114,6 +114,36 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(len(self.store), 1)
         self.assertEqual(self.store.duplicate_game_ids, {"steam_1"})
 
+    def test_a_rescan_teaches_the_emulator_to_a_game_imported_before(self):
+        saved = []
+
+        class Stored(FakeGame):
+            emulator = console = None
+
+            def update_values(self, data):
+                for key, value in data.items():
+                    setattr(self, key, value)
+
+            def save(self):
+                saved.append("save")
+
+            def update(self):
+                saved.append("update")
+
+        stored = Stored("desktop_gt4", "desktop")
+        self.store.add_game(stored, {}, run_pipeline=False)
+        scanned = FakeGame("desktop_gt4", "desktop")
+        scanned.emulator, scanned.console = "pcsx2", "ps2"
+        self.store.add_game(scanned, {}, run_pipeline=False)
+        self.assertEqual((stored.emulator, stored.console), ("pcsx2", "ps2"))
+        self.assertEqual(saved, ["save", "update"])
+        # Seen again with the same values: nothing to save
+        self.store.add_game(scanned, {}, run_pipeline=False)
+        self.assertEqual(saved, ["save", "update"])
+        # A scan that finds no emulator never erases a known one
+        self.store.add_game(FakeGame("desktop_gt4", "desktop"), {}, run_pipeline=False)
+        self.assertEqual(stored.emulator, "pcsx2")
+
     def test_replacing_a_removed_game(self):
         old = FakeGame("steam_1", removed=True)
         # A removed game loaded from disk is cleaned up and not stored

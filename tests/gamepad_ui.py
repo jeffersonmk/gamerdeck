@@ -536,6 +536,42 @@ def steps(app):
     yield from settle(lambda: win.get_visible_dialog() is None)
     check("B closes the dialog", win.get_visible_dialog() is None)
 
+    # Preferences > Updates, only for an installation that knows its source
+    from cartridges.utils import updater
+
+    check("no Updates group without a known source", app.on_preferences_action().updates_group.get_visible() is False)
+    win.get_visible_dialog().close()
+    yield 400
+    updater.source_dir = lambda *_a: SANDBOX
+    calls = []
+    updater.check = lambda *_a, **_k: calls.append("check") or updater.UpdateResult(True, updater.UPDATE_AVAILABLE, "new")
+    updater.update = lambda *_a, **_k: calls.append("update") or updater.UpdateResult(True, 0, "done")
+    prefs = app.on_preferences_action()
+    yield from settle(lambda: win.get_visible_dialog() is not None)
+    yield 300
+    check("the Updates group shows for an installation with a source", prefs.updates_group.get_visible())
+    prefs.update_button.grab_focus()
+    yield 400
+    shot("7-updates")
+    prefs.update_button.emit("clicked")
+    yield from settle(lambda: len(calls) == 2, 4000)
+    yield 500
+    check("Update checks, then installs", calls == ["check", "update"])
+    check("the button is back after the update", prefs.update_button.get_sensitive() and not prefs.update_spinner.get_visible())
+    top = win.get_visible_dialog()
+    check("it says the app was updated", isinstance(top, Adw.AlertDialog) and top.get_heading() == "Updated")
+    shot("7-updated")
+    top.force_close()
+    yield 300
+    prefs.on_update_done(updater.UpdateResult(False, 1, "git said no"), False)
+    yield 300
+    top = win.get_visible_dialog()
+    check("a failed update shows the error", isinstance(top, Adw.AlertDialog) and "git said no" in top.get_body())
+    top.force_close()
+    yield 300
+    prefs.force_close()
+    yield from settle(lambda: win.get_visible_dialog() is None)
+
     # Hidden games page and back
     win.activate_action("win.show_hidden", None)
     yield 500
