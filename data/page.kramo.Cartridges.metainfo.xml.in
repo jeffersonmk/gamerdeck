@@ -49,6 +49,14 @@
   </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="1.1.0" date="2026-11-02">
+      <description translate="no">
+        <ul>
+          <li>Games started through an emulator (PCSX2, Dolphin, PPSSPP, mGBA and others) show the icon of their console on the cover</li>
+          <li>A preference to show or hide the Continue Playing row</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-11-01">
       <description translate="no">
         <p>The first release of Gamerdeck, a game launcher for Linux.</p>

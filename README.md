@@ -40,6 +40,7 @@ These are the app itself, taken on a demo library of made-up games with covers d
 | More sources | [Faugus Launcher](https://github.com/Faugus/faugus-launcher), and a Lutris importer that no longer duplicates games or loses the hidden state |
 | Platform badge | Each cover shows where the game came from; clicking it opens that app |
 | ProtonDB | The rating of each game on its cover and on its page |
+| Emulator icons | Games started through an emulator show the icon of their console on the cover (PS2, GameCube, PSP, GBA, SNES...) |
 | Vitrine layout | A banner with the game in focus and a "Continue Playing" row, in the colors of the system theme |
 | Controller | The whole app works with an Xbox or PlayStation controller, with a legend of what each button does |
 
